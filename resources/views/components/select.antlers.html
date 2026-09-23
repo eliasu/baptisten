@@ -1,0 +1,36 @@
+---
+# The text above the field.
+label: Auswahl
+# Which option starts out chosen.
+value: null
+# What there is to choose from: a list of values, or a map of value → label
+# (a map with numeric keys reads as a list).
+# Only the `list` variant is ported (month, day, year and state are not).
+options: null
+# The name it submits under. Taken from the label where it is not set.
+name: null
+# The text shown before a choice is made.
+placeholder: Bitte wählen …
+# Marks the field as needed, and stars its label.
+required: false
+# Keeps the label for a screen reader, and takes it off the page.
+label_hidden: false
+class: null
+---
+{{ if view:options }}
+<label class="field form-select{{ if view:class }} {{ view:class }}{{ /if }}">
+    <span class="field-label text-style-main{{ if view:label_hidden | to_bool }} sr-only{{ /if }}">
+        <span>{{ view:label }}</span>{{ if view:required | to_bool }}<span class="field-star" aria-hidden="true">*</span>{{ /if }}
+    </span>
+    <span class="form-select_control">
+        <select class="field-control form-select_field text-style-main" name="{{ view:name ?? (view:label | slugify) }}"{{ if view:required | to_bool }} required{{ /if }}>
+            <option value="" disabled{{ unless view:value }} selected{{ /unless }} hidden>{{ view:placeholder }}</option>
+            {{ foreach :array="view:options" }}
+                {{ _option_value = (key | is_numeric) ? value : key }}
+                <option value="{{ _option_value }}"{{ if _option_value == view:value }} selected{{ /if }}>{{ value }}</option>
+            {{ /foreach }}
+        </select>
+        {{ partial:components/icon name="arrow" variant="small" class="form-select_mark" }}
+    </span>
+</label>
+{{ /if }}

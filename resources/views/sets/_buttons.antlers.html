@@ -1,0 +1,11 @@
+{{# Style follows position: the first is primary, the second secondary.
+    `items` lets a page with more than one button group point at its own
+    field; left unset it reads the set's own `buttons`. #}}
+{{ _items = view:items ?? buttons }}
+{{ if _items }}
+{{ partial:components/button-wrapper :margin_top="view:margin_top ?? 'default'" }}
+    {{ _items scope="button" }}
+        {{ partial:components/button element="link" :href="button:link:url ?? button:link" :emphasis="first ? 'primary' : 'secondary'" }}{{ button:label }}{{ /partial:components/button }}
+    {{ /_items }}
+{{ /partial:components/button-wrapper }}
+{{ /if }}

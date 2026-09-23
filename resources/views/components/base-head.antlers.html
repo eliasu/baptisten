@@ -1,0 +1,36 @@
+---
+# Page title. Rendered as `{title} | {site name}`; omit for the site name alone.
+title: null
+# Meta description, also used for og:description and twitter:description. Defaults to Globals → SEO.
+description: null
+# Social share image (asset or path). Defaults to Globals → SEO.
+image: null
+# Open Graph type. Defaults to `website`; use `article` for posts and news pages.
+type: website
+# Adds `robots: noindex, nofollow`.
+noindex: false
+---
+{{ _page_title = view:title ? '{view:title} | {site:name}' : site:name }}
+{{ _description = view:description ?? seo:description }}
+{{ _image = view:image ?? seo:image }}
+<meta charset="utf-8">
+<style>@layer base, patterns, components, utilities;</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ _page_title | sanitize }}</title>
+{{ if _description }}<meta name="description" content="{{ _description | sanitize }}">{{ /if }}
+<link rel="canonical" href="{{ current_url }}">
+{{ if view:noindex | to_bool }}<meta name="robots" content="noindex, nofollow">{{ /if }}
+
+<meta property="og:type" content="{{ view:type }}">
+<meta property="og:site_name" content="{{ site:name | sanitize }}">
+<meta property="og:title" content="{{ _page_title | sanitize }}">
+{{ if _description }}<meta property="og:description" content="{{ _description | sanitize }}">{{ /if }}
+<meta property="og:url" content="{{ current_url }}">
+{{ if _image }}<meta property="og:image" content="{{ glide :src="_image" width="1200" height="630" fit="crop_focal" absolute="true" }}">{{ /if }}
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ _page_title | sanitize }}">
+{{ if _description }}<meta name="twitter:description" content="{{ _description | sanitize }}">{{ /if }}
+{{ if _image }}<meta name="twitter:image" content="{{ glide :src="_image" width="1200" height="630" fit="crop_focal" absolute="true" }}">{{ /if }}
+
+<link rel="icon" href="/favicon.ico">

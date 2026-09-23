@@ -1,0 +1,65 @@
+---
+# Small line of text above the heading. Inline markup is rendered.
+eyebrow: null
+# The card's title. Inline markup is rendered.
+heading: null
+# Heading level, for the page outline.
+heading_tag: h3
+# Statamic port: upstream fixes every card heading at one size. Two cards
+# standing alone as feature panels need the display size, so the size is a
+# param — left alone, a grid of cards still reads as one system.
+heading_variant: h5
+# Body copy under the heading. Inline markup is rendered, so it can carry a
+# link — one inside a clickable card stays clickable on its own.
+text: null
+# Label of the closing button. Nothing renders without one.
+button_label: null
+# Where the button leads. Left out, it renders as a plain button.
+button_href: null
+# Where the image sits.
+#   default — no image, text only (default)
+#   cover — image fills the card, text over it
+#   stacked — image above the text, bleeding to the edges
+variant: default
+# Colors the card carries with it, whatever section it sits in:
+# inherit, light, dark, brand or invert. Not for `stacked`, which keeps the
+# theme around it.
+theme: inherit
+# An asset, or a path/URL. cover, stacked only.
+image: null
+# Leave unset on decorative images — renders `alt=""`. cover, stacked only.
+image_alt: null
+class: null
+---
+{{ _has_image = view:variant != 'default' && view:image }}
+{{ _has_content = view:eyebrow || view:heading || view:text || view:button_label }}
+{{ if _has_image || _has_content }}
+{{# The button each variant closes with, so a set of cards reads as one system.
+    A link carries no emphasis of its own, so the two are picked together. #}}
+{{ _btn_variant = view:variant == 'stacked' ? 'link' : 'main' }}
+{{ _btn_emphasis = view:variant == 'cover' ? 'primary' : 'secondary' }}
+<div class="card_wrap{{ if view:variant != 'default' }} {{ view:variant }}{{ /if }}{{ if view:variant != 'stacked' && view:theme != 'inherit' }} theme-{{ view:theme }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ if _has_image }}
+    <div class="card_visual">
+        {{ partial:components/img :image="view:image" :alt="view:image_alt" }}
+        {{ if view:variant == 'cover' }}{{ partial:components/overlay variant="gradient" }}{{ /if }}
+    </div>
+    {{ /if }}
+    {{ if _has_content }}
+    <div class="card_content margin-trim">
+        {{ partial:components/eyebrow }}{{ view:eyebrow }}{{ /partial:components/eyebrow }}
+        {{ partial:components/heading :tag="view:heading_tag" :variant="view:heading_variant" }}{{ view:heading }}{{ /partial:components/heading }}
+        {{ partial:components/paragraph }}{{ view:text }}{{ /partial:components/paragraph }}
+        {{ if view:button_label }}
+        {{ partial:components/button-wrapper }}
+            {{ if view:button_href }}
+            {{ partial:components/button element="link" :href="view:button_href" :variant="_btn_variant" :emphasis="_btn_emphasis" }}{{ view:button_label }}{{ /partial:components/button }}
+            {{ else }}
+            {{ partial:components/button :variant="_btn_variant" :emphasis="_btn_emphasis" }}{{ view:button_label }}{{ /partial:components/button }}
+            {{ /if }}
+        {{ /partial:components/button-wrapper }}
+        {{ /if }}
+    </div>
+    {{ /if }}
+</div>
+{{ /if }}

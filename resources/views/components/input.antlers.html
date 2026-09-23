@@ -1,0 +1,43 @@
+---
+# The text above the field. Defaults to the wording of the variant.
+label: null
+# What the field starts out holding.
+value: null
+# What the field is for. It settles the input's type, keyboard, autofill and
+# wording together, so a field only has to say which one it is.
+#   text — anything else, with no assumptions (default)
+#   first-name, last-name, zip-code — autofilled from an address
+#   email, phone, url, number, date — a keyboard and validation to match
+#   search, password — the browser's own handling of each
+variant: text
+# The name it submits under. Taken from the label where it is not set.
+name: null
+# The text shown in an empty field. Defaults to the wording of the variant.
+placeholder: null
+# Marks the field as needed, and stars its label.
+required: false
+# Keeps the label for a screen reader, and takes it off the page.
+label_hidden: false
+class: null
+---
+{{ _kinds = [
+    'text' => ['label' => 'Text', 'type' => 'text', 'mode' => 'text', 'fill' => 'on'],
+    'first-name' => ['label' => 'Vorname', 'type' => 'text', 'mode' => 'text', 'fill' => 'given-name'],
+    'last-name' => ['label' => 'Nachname', 'type' => 'text', 'mode' => 'text', 'fill' => 'family-name'],
+    'email' => ['label' => 'E-Mail', 'type' => 'email', 'mode' => 'email', 'fill' => 'email'],
+    'phone' => ['label' => 'Telefon', 'type' => 'tel', 'mode' => 'tel', 'fill' => 'tel'],
+    'date' => ['label' => 'Datum', 'type' => 'date', 'mode' => 'text', 'fill' => 'bday'],
+    'zip-code' => ['label' => 'PLZ', 'type' => 'text', 'mode' => 'numeric', 'fill' => 'postal-code'],
+    'number' => ['label' => 'Zahl', 'type' => 'number', 'mode' => 'numeric', 'fill' => 'off'],
+    'search' => ['label' => 'Suche', 'type' => 'search', 'mode' => 'search', 'fill' => 'off'],
+    'password' => ['label' => 'Passwort', 'type' => 'password', 'mode' => 'text', 'fill' => 'current-password'],
+    'url' => ['label' => 'URL', 'type' => 'url', 'mode' => 'url', 'fill' => 'url'],
+] }}
+{{ _kind = _kinds[view:variant] ?? _kinds['text'] }}
+{{ _text = view:label ?? _kind:label }}
+<label class="field form-input{{ if view:class }} {{ view:class }}{{ /if }}">
+    <span class="field-label text-style-main{{ if view:label_hidden | to_bool }} sr-only{{ /if }}">
+        <span>{{ _text }}</span>{{ if view:required | to_bool }}<span class="field-star" aria-hidden="true">*</span>{{ /if }}
+    </span>
+    <input class="field-control text-style-main" type="{{ _kind:type }}" name="{{ view:name ?? (_text | slugify) }}" placeholder="{{ view:placeholder ?? _text }}" inputmode="{{ _kind:mode }}" autocomplete="{{ _kind:fill }}"{{ if view:required | to_bool }} required{{ /if }}{{ if view:value }} value="{{ view:value }}"{{ /if }}>
+</label>

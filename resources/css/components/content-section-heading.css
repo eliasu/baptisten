@@ -1,0 +1,32 @@
+.section-heading_wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: var(--_alignment, start);
+  gap: var(--space-3);
+
+  /* The gap above sets the rhythm here, not each style's own margin. */
+  > [class] {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* Label and note hold the two ends of one line. The note drops below the
+   label before the two would collide. */
+.section-heading_index {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+}
+
+/* Already written in capitals, and quieter than a label. */
+.section-heading_note {
+  color: var(--text-2);
+  font-weight: var(--primary-regular);
+  letter-spacing: var(--letter-spacing-normal);
+  text-transform: none;
+}

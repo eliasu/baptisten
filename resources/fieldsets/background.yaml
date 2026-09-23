@@ -1,0 +1,12 @@
+title: Hintergrund
+fields:
+  -
+    handle: background
+    field:
+      type: button_group
+      display: Hintergrund
+      instructions: 'Hell oder dunkel. Alles andere am Aussehen des Abschnitts steht fest.'
+      options:
+        light: Hell
+        dark: Dunkel
+      default: light

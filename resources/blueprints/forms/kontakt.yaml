@@ -1,0 +1,32 @@
+title: Kontakt
+tabs:
+  main:
+    display: Felder
+    sections:
+      -
+        fields:
+          -
+            handle: name
+            field:
+              type: text
+              display: Name
+              validate:
+                - required
+              width: 50
+          -
+            handle: email
+            field:
+              type: text
+              input_type: email
+              display: E-Mail
+              validate:
+                - required
+                - email
+              width: 50
+          -
+            handle: message
+            field:
+              type: textarea
+              display: Nachricht
+              validate:
+                - required

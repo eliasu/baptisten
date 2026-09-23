@@ -1,0 +1,460 @@
+title: Seite
+tabs:
+  main:
+    display: Inhalt
+    sections:
+      -
+        fields:
+          -
+            handle: title
+            field:
+              type: text
+              display: Titel
+              instructions: 'Der Name der Seite. Erscheint in der Navigation und im Browser-Tab.'
+              character_limit: 60
+              required: true
+              validate:
+                - required
+          -
+            handle: blocks
+            field:
+              type: replicator
+              display: Abschnitte
+              instructions: 'Die Seite wird aus Abschnitten zusammengesetzt. Die Reihenfolge lässt sich ziehen.'
+              button_label: 'Abschnitt hinzufügen'
+              collapse: accordion
+              sets:
+                intro:
+                  display: Einstieg
+                  sets:
+                    hero:
+                      display: Kopfbereich
+                      icon: hero-image-above-text
+                      instructions: 'Der Auftakt einer Seite: kurze Zeile, große Überschrift, Einleitung und Buttons.'
+                      fields:
+                        -
+                          handle: eyebrow
+                          field:
+                            type: text
+                            display: Kurze Zeile darüber
+                            instructions: 'Ein paar Wörter über der Überschrift, etwa ein Thema oder ein Datum.'
+                            character_limit: 40
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            character_limit: 70
+                            validate:
+                              - required
+                        -
+                          handle: text
+                          field:
+                            type: textarea
+                            display: Einleitung
+                            instructions: 'Ein bis drei Sätze.'
+                            character_limit: 300
+                        -
+                          import: buttons
+                        -
+                          handle: image
+                          field:
+                            type: assets
+                            display: Bild
+                            instructions: 'Optional. Steht das Bild hier, rückt der Text daneben.'
+                            container: assets
+                            max_files: 1
+                        -
+                          import: background
+                    cta:
+                      display: Handlungsaufruf
+                      icon: megaphone
+                      instructions: 'Eine Aufforderung mit Buttons — etwa „Besuchen Sie uns“.'
+                      fields:
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            character_limit: 70
+                            validate:
+                              - required
+                        -
+                          handle: text
+                          field:
+                            type: textarea
+                            display: Text
+                            character_limit: 300
+                        -
+                          import: buttons
+                        -
+                          import: background
+                content:
+                  display: Inhalt
+                  sets:
+                    text:
+                      display: Fließtext
+                      icon: text-formatting-paragraph
+                      instructions: 'Durchgehender Text mit Zwischenüberschriften, Listen und Links.'
+                      fields:
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            instructions: Optional.
+                            character_limit: 70
+                        -
+                          handle: text
+                          field:
+                            type: bard
+                            display: Text
+                            buttons:
+                              - bold
+                              - italic
+                              - anchor
+                              - unorderedlist
+                              - orderedlist
+                              - h3
+                            save_html: true
+                            validate:
+                              - required
+                        -
+                          import: background
+                    text_image:
+                      display: 'Text & Bild'
+                      icon: layout-two-columns
+                      instructions: 'Text links, Bild rechts. Auf dem Handy steht der Text über dem Bild.'
+                      fields:
+                        -
+                          handle: eyebrow
+                          field:
+                            type: text
+                            display: Kurze Zeile darüber
+                            character_limit: 40
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            character_limit: 70
+                            validate:
+                              - required
+                        -
+                          handle: text
+                          field:
+                            type: bard
+                            display: Text
+                            buttons:
+                              - bold
+                              - italic
+                              - anchor
+                              - unorderedlist
+                              - orderedlist
+                            save_html: true
+                        -
+                          import: buttons
+                        -
+                          handle: image
+                          field:
+                            type: assets
+                            display: Bild
+                            container: assets
+                            max_files: 1
+                            validate:
+                              - required
+                        -
+                          import: background
+                    cards:
+                      display: Karten
+                      icon: layout-grid
+                      instructions: 'Mehrere gleichwertige Einträge nebeneinander — Angebote, Gruppen, Ansprechpartner.'
+                      fields:
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            instructions: Optional.
+                            character_limit: 70
+                        -
+                          handle: text
+                          field:
+                            type: textarea
+                            display: Einleitung
+                            instructions: Optional.
+                            character_limit: 300
+                        -
+                          handle: cards
+                          field:
+                            type: grid
+                            display: Karten
+                            instructions: 'Drei bis sechs Karten sehen am besten aus.'
+                            mode: stacked
+                            add_row: 'Karte hinzufügen'
+                            fields:
+                              -
+                                handle: eyebrow
+                                field:
+                                  type: text
+                                  display: Kurze Zeile darüber
+                                  character_limit: 30
+                                  width: 50
+                              -
+                                handle: heading
+                                field:
+                                  type: text
+                                  display: Überschrift
+                                  character_limit: 50
+                                  validate:
+                                    - required
+                                  width: 50
+                              -
+                                handle: text
+                                field:
+                                  type: textarea
+                                  display: Text
+                                  character_limit: 240
+                              -
+                                handle: image
+                                field:
+                                  type: assets
+                                  display: Bild
+                                  instructions: 'Optional. Mit Bild wird die Karte zur Bildkarte.'
+                                  container: assets
+                                  max_files: 1
+                                  width: 50
+                              -
+                                handle: link
+                                field:
+                                  type: link
+                                  display: Ziel
+                                  instructions: 'Optional. Mit Ziel bekommt die Karte einen Button.'
+                                  width: 50
+                              -
+                                handle: link_label
+                                field:
+                                  type: text
+                                  display: 'Beschriftung des Buttons'
+                                  character_limit: 30
+                                  width: 50
+                        -
+                          import: background
+                    accordion:
+                      display: 'Fragen & Antworten'
+                      icon: layout-flip-up
+                      instructions: 'Fragen, die sich einzeln aufklappen lassen.'
+                      fields:
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            character_limit: 70
+                        -
+                          handle: items
+                          field:
+                            type: grid
+                            display: Fragen
+                            mode: stacked
+                            add_row: 'Frage hinzufügen'
+                            fields:
+                              -
+                                handle: question
+                                field:
+                                  type: text
+                                  display: Frage
+                                  character_limit: 100
+                                  validate:
+                                    - required
+                              -
+                                handle: answer
+                                field:
+                                  type: bard
+                                  display: Antwort
+                                  buttons:
+                                    - bold
+                                    - italic
+                                    - anchor
+                                    - unorderedlist
+                                    - orderedlist
+                                  save_html: true
+                                  validate:
+                                    - required
+                        -
+                          import: background
+                    tabs:
+                      display: Reiter
+                      icon: split-window
+                      instructions: 'Mehrere Inhalte, von denen immer einer sichtbar ist.'
+                      fields:
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            character_limit: 70
+                        -
+                          handle: items
+                          field:
+                            type: grid
+                            display: Reiter
+                            instructions: 'Zwei bis fünf Reiter.'
+                            mode: stacked
+                            add_row: 'Reiter hinzufügen'
+                            fields:
+                              -
+                                handle: label
+                                field:
+                                  type: text
+                                  display: 'Beschriftung des Reiters'
+                                  character_limit: 30
+                                  validate:
+                                    - required
+                              -
+                                handle: heading
+                                field:
+                                  type: text
+                                  display: Überschrift
+                                  character_limit: 70
+                              -
+                                handle: text
+                                field:
+                                  type: bard
+                                  display: Text
+                                  buttons:
+                                    - bold
+                                    - italic
+                                    - anchor
+                                    - unorderedlist
+                                    - orderedlist
+                                  save_html: true
+                              -
+                                handle: image
+                                field:
+                                  type: assets
+                                  display: Bild
+                                  instructions: Optional.
+                                  container: assets
+                                  max_files: 1
+                        -
+                          import: background
+                media:
+                  display: Medien
+                  sets:
+                    gallery:
+                      display: Galerie
+                      icon: layout-carousel-horizontal
+                      instructions: 'Bilder, die sich seitlich durchblättern lassen.'
+                      fields:
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            character_limit: 70
+                        -
+                          handle: images
+                          field:
+                            type: assets
+                            display: Bilder
+                            instructions: 'Mindestens drei.'
+                            container: assets
+                            mode: grid
+                            validate:
+                              - required
+                        -
+                          import: background
+                    logos:
+                      display: Logo-Laufband
+                      icon: layout-carousel-horizontal-2
+                      instructions: 'Ein Band aus Logos, das langsam durchläuft.'
+                      fields:
+                        -
+                          handle: images
+                          field:
+                            type: assets
+                            display: Logos
+                            instructions: 'Am besten freigestellte Dateien mit transparentem Hintergrund.'
+                            container: assets
+                            mode: grid
+                            validate:
+                              - required
+                        -
+                          import: background
+                contact:
+                  display: Kontakt
+                  sets:
+                    form:
+                      display: Formular
+                      icon: forms
+                      instructions: 'Ein Formular, dessen Felder unter Formulare gepflegt werden.'
+                      fields:
+                        -
+                          handle: heading
+                          field:
+                            type: text
+                            display: Überschrift
+                            character_limit: 70
+                        -
+                          handle: text
+                          field:
+                            type: textarea
+                            display: Einleitung
+                            character_limit: 300
+                        -
+                          handle: form
+                          field:
+                            type: form
+                            display: Formular
+                            max_items: 1
+                            validate:
+                              - required
+                        -
+                          import: background
+  seo:
+    display: SEO
+    sections:
+      -
+        fields:
+          -
+            handle: meta_description
+            field:
+              type: textarea
+              display: Suchmaschinen-Beschreibung
+              instructions: 'Der Text unter dem Titel in den Suchergebnissen. Leer gelassen, greift der Fallback aus Globals → SEO.'
+              character_limit: 160
+          -
+            handle: og_image
+            field:
+              type: assets
+              display: Teilen-Bild
+              instructions: 'Wird angezeigt, wenn ein Link zu dieser Seite geteilt wird. Leer gelassen, greift der Fallback aus Globals → SEO.'
+              container: assets
+              max_files: 1
+          -
+            handle: noindex
+            field:
+              type: toggle
+              display: 'Von Suchmaschinen ausschließen'
+              instructions: 'Die Seite bleibt erreichbar, taucht aber nicht in Suchergebnissen auf.'
+              default: false
+  settings:
+    display: Einstellungen
+    sections:
+      -
+        fields:
+          -
+            handle: nav_overlap
+            field:
+              type: toggle
+              display: 'Navigation über den ersten Abschnitt legen'
+              instructions: 'Nur sinnvoll, wenn der erste Abschnitt ein dunkles Bild als Hintergrund hat.'
+              default: false
+          -
+            handle: template
+            field:
+              type: template
+              display: Template
+              instructions: 'Nur ändern, wenn für diese Seite ein eigenes Template gebaut wurde.'
+              hide_partials: true

@@ -1,0 +1,13 @@
+tree:
+  -
+    title: Instagram
+    url: 'https://www.instagram.com'
+  -
+    title: Datenschutz
+    url: '#datenschutz'
+  -
+    title: Impressum
+    url: '#impressum'
+  -
+    title: Kontakt
+    url: '#kontakt'

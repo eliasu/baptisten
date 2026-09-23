@@ -1,0 +1,28 @@
+---
+# Video file: an asset or a URL. Nothing is output if it is missing.
+# Lumos: `src`, reserved by the partial tag.
+file: null
+# Still frame shown before playback starts: an asset or a URL.
+poster: null
+# Aspect ratio, applied with the matching `ratio-*` utility.
+#   2-1, 16-9 — widescreen (16-9 is the default)
+#   3-2, 5-4, 1-1 — squarer
+#   4-5, 2-3 — upright, for a phone
+# `custom` takes a ratio of your own. `auto` matches the file, but its height
+# is unknown until the file's metadata arrives, so the page shifts once it loads.
+variant: 16-9
+# Any CSS `aspect-ratio` value, such as `21 / 9` or `1.85`. custom only.
+ratio: null
+# Restart from the beginning on reaching the end.
+loop: true
+# Begin playing without interaction. Browsers only permit this while muted.
+autoplay: true
+# Play without sound. Required for autoplay to be allowed.
+muted: true
+# For cutouts: fit the whole frame in rather than cropping, and drop the skeleton tint.
+transparent: false
+class: null
+---
+{{ if view:file }}
+<video src="{{ view:file:url ?? view:file }}"{{ if view:poster }} poster="{{ view:poster:url ?? view:poster }}"{{ /if }} class="video{{ if view:variant != 'custom' }} ratio-{{ view:variant }}{{ /if }}{{ if view:transparent | to_bool }} transparent{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}"{{ if view:variant == 'custom' && view:ratio }} style="aspect-ratio: {{ view:ratio }};"{{ /if }}{{ if view:loop | to_bool }} loop{{ /if }}{{ if view:autoplay | to_bool }} autoplay{{ /if }}{{ if view:muted | to_bool }} muted{{ /if }} playsinline></video>
+{{ /if }}

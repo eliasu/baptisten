@@ -1,0 +1,118 @@
+.slider_wrap {
+  --_gap-size: var(--site-gutter);
+  --_edge: max(var(--site-margin), (100vw - var(--max-width-main)) / 2);
+  --_visible: var(--_visible-xs);
+  --_visible-xs: 1.02;
+  --_visible-sm: var(--_visible-xs);
+  --_visible-md: var(--_visible-sm);
+  --_visible-lg: var(--_visible-md);
+  display: grid;
+  gap: var(--space-6);
+  width: 100%;
+
+  @media (width >= 30rem) {
+    --_visible: var(--_visible-sm);
+  }
+  @media (width >= 48rem) {
+    --_visible: var(--_visible-md);
+  }
+  @media (width >= 64rem) {
+    --_visible: var(--_visible-lg);
+  }
+}
+
+.slider_list {
+  display: flex;
+  gap: var(--_gap-size);
+  min-width: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  cursor: grab;
+  margin-inline: calc(-1 * var(--_edge));
+  padding-inline: var(--_edge);
+  scroll-padding-inline: var(--_edge);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.is-dragging {
+    scroll-snap-type: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .slider_wrap:not(.is-ready) &,
+  .slider_wrap:has(.slider_controls.is-empty) & {
+    cursor: auto;
+  }
+
+  & > * {
+    flex: 0 0
+      calc(
+        (100% - (var(--_visible) - 1) * var(--_gap-size)) / var(--_visible)
+      );
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .slider_wrap.crop-start & {
+    margin-inline-start: 0;
+    padding-inline-start: 0;
+    scroll-padding-inline-start: 0;
+  }
+
+  .slider_wrap.contained & {
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+}
+
+.slider_controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+
+  .slider_wrap:not(.is-ready) &,
+  &.is-empty {
+    display: none;
+  }
+}
+
+.slider_markers {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.slider_marker {
+  width: 0.75rem;
+  height: 0.75rem;
+  padding: 0;
+  border: var(--border-width) solid var(--text);
+  border-radius: var(--radius-round);
+  background: none;
+  transition: background-color var(--hover-duration) var(--hover-ease);
+
+  &.is-active {
+    background-color: var(--text);
+  }
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--text);
+    }
+  }
+}
+
+.slider_steps {
+  display: flex;
+  gap: var(--space-2);
+}

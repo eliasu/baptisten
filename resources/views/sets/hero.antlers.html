@@ -1,0 +1,16 @@
+{{ if image }}
+{{ partial:components/content-wrapper variant="columns" }}
+    {{ partial:components/eyebrow }}{{ eyebrow }}{{ /partial:components/eyebrow }}
+    {{ partial:components/heading tag="h1" variant="h1" }}{{ heading }}{{ /partial:components/heading }}
+    {{ partial:components/paragraph variant="large" max_width="48" }}{{ text | nl2br }}{{ /partial:components/paragraph }}
+    {{ partial:sets/_buttons }}
+    {{ slot:column2 }}{{ partial:components/img :image="image" loading="eager" fetch_priority="high" }}{{ /slot:column2 }}
+{{ /partial:components/content-wrapper }}
+{{ else }}
+{{ partial:components/content-wrapper centered="true" }}
+    {{ partial:components/eyebrow }}{{ eyebrow }}{{ /partial:components/eyebrow }}
+    {{ partial:components/heading tag="h1" variant="display" }}{{ heading }}{{ /partial:components/heading }}
+    {{ partial:components/paragraph variant="large" max_width="48" }}{{ text | nl2br }}{{ /partial:components/paragraph }}
+    {{ partial:sets/_buttons }}
+{{ /partial:components/content-wrapper }}
+{{ /if }}

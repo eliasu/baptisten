@@ -1,0 +1,29 @@
+title: Buttons
+fields:
+  -
+    handle: buttons
+    field:
+      type: grid
+      display: Buttons
+      instructions: 'Höchstens zwei. Der erste wird hervorgehoben, der zweite zurückhaltend gesetzt.'
+      mode: stacked
+      add_row: 'Button hinzufügen'
+      max_rows: 2
+      fields:
+        -
+          handle: label
+          field:
+            type: text
+            display: Beschriftung
+            character_limit: 30
+            validate:
+              - required
+            width: 50
+        -
+          handle: link
+          field:
+            type: link
+            display: Ziel
+            validate:
+              - required
+            width: 50

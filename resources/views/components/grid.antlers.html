@@ -1,0 +1,30 @@
+---
+# How the columns are decided.
+#   columns — a count you set per breakpoint (default)
+#   autofit — as many columns as fit, from a minimum width
+#   autofill — same, but empty columns keep their space
+variant: columns
+# Columns below 30rem. The base every larger size falls back to. columns only.
+xsmall: 1
+# Columns from 30rem up. Inherits xsmall when unset. columns only.
+small: null
+# Columns from 48rem up. Inherits small when unset. columns only.
+medium: null
+# Columns from 64rem up. Inherits medium when unset. columns only.
+large: null
+# Never exceed this many columns, however wide the grid gets. Defaults to 12. autofit, autofill only.
+max_column_count: null
+# Smallest a column may get, in rem, before the count drops. Must be greater than 0. Defaults to 12. autofit, autofill only.
+min_column_width: null
+class: null
+---
+{{ if slot | trim }}
+{{ if view:variant == 'columns' }}
+{{ _style = (view:xsmall != 1 ? '--_cols-xs: {view:xsmall}; ' : '') + (view:small ? '--_cols-sm: {view:small}; ' : '') + (view:medium ? '--_cols-md: {view:medium}; ' : '') + (view:large ? '--_cols-lg: {view:large};' : '') }}
+{{ else }}
+{{ _style = (view:max_column_count ? '--_max-cols: {view:max_column_count}; ' : '') + (view:min_column_width > 0 ? '--_min-col-width: {view:min_column_width};' : '') }}
+{{ /if }}
+<div class="grid{{ if view:variant != 'columns' }} {{ view:variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}"{{ if _style | trim }} style="{{ _style | trim }}"{{ /if }}>
+    {{ slot | trim }}
+</div>
+{{ /if }}

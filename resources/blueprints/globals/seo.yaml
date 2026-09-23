@@ -1,0 +1,17 @@
+title: SEO
+fields:
+  -
+    handle: description
+    field:
+      type: textarea
+      display: 'Beschreibung (Fallback)'
+      instructions: 'Wird für Seiten ohne eigene Beschreibung verwendet. Etwa 155 Zeichen.'
+      character_limit: 160
+  -
+    handle: image
+    field:
+      type: assets
+      display: 'Teilen-Bild (Fallback)'
+      instructions: 'Wird angezeigt, wenn ein Link zur Seite geteilt wird. Quer, mindestens 1200 × 630 Pixel.'
+      container: assets
+      max_files: 1

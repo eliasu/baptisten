@@ -1,0 +1,12 @@
+.form-textarea_field {
+  field-sizing: content;
+  min-height: calc(
+    var(--_min-lines, 3) * 1lh + var(--field-pad-block) * 2 +
+      var(--border-width) * 2
+  );
+  max-height: calc(
+    var(--_max-lines, 12) * 1lh + var(--field-pad-block) * 2 +
+      var(--border-width) * 2
+  );
+  resize: vertical;
+}

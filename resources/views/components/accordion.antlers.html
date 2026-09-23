@@ -1,0 +1,20 @@
+---
+# Only one item stays open at a time. Set "false" to open them independently.
+single: true
+# Opens the first item on load. Every item starts closed otherwise.
+open_first: false
+class: null
+---
+{{# Built on <details name>: no JS. Statamic port: upstream's accordion script
+    only drives its visual builder's preview, so it isn't carried over — nor is
+    the `preview` prop. The same goes for the `.preview` rules left in the CSS. #}}
+{{ _items = slot | trim }}
+{{ if _items }}
+{{ _single = view:single | to_bool }}
+{{ _group = _single ? ('name="accordion-' + (_items | md5 | substr(0, 8)) + '"') : '' }}
+{{ _open_first = view:open_first | to_bool }}
+{{ _parts = _items | explode('data-accordion-group') }}
+<div class="accordion_wrap{{ if _single }} single{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ _parts }}{{ if index > 0 }}{{ _group }}{{ if index == 1 && _open_first }} open{{ /if }}{{ /if }}{{ value }}{{ /_parts }}
+</div>
+{{ /if }}

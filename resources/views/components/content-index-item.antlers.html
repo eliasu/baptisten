@@ -1,0 +1,42 @@
+---
+# What stands at the head of the row: a number, a weekday, a span of time.
+marker: null
+# How much room the marker takes.
+#   default — as wide as its content, sized to sit beside the title
+#   large — a fixed column, for a marker that carries the row
+marker_variant: default
+# The small label above the title.
+eyebrow: null
+# The row's title. Inline markup is rendered.
+heading: null
+# Heading level, for the page outline. The size is fixed.
+heading_tag: h3
+# Body copy under the title. Inline markup is rendered.
+text: null
+# Label of the link closing the row. Nothing renders without one.
+link_label: null
+# Where that link leads.
+link_href: null
+class: null
+---
+{{ if (view:heading | trim) || (view:marker | trim) }}
+<li class="index-item_wrap{{ if view:marker_variant != 'default' }} {{ view:marker_variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ if view:marker | trim }}
+        <p class="index-item_marker" aria-hidden="true">{{ view:marker }}</p>
+    {{ /if }}
+    <div class="index-item_details">
+        {{ if view:eyebrow | trim }}
+            {{ partial:components/eyebrow }}{{ view:eyebrow }}{{ /partial:components/eyebrow }}
+        {{ /if }}
+        {{ if view:heading | trim }}
+            {{ partial:components/heading :tag="view:heading_tag" variant="h4" }}{{ view:heading }}{{ /partial:components/heading }}
+        {{ /if }}
+        {{ if view:text | trim }}
+            {{ partial:components/paragraph variant="small" }}{{ view:text }}{{ /partial:components/paragraph }}
+        {{ /if }}
+        {{ if view:link_label | trim }}
+            {{ partial:components/button element="link" variant="link" :href="view:link_href" }}{{ view:link_label }}{{ /partial:components/button }}
+        {{ /if }}
+    </div>
+</li>
+{{ /if }}

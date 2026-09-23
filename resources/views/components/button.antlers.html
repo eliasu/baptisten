@@ -1,0 +1,47 @@
+---
+# What it renders as: button or link.
+element: button
+# Where the link goes. Link only.
+href: null
+# button, submit or reset. Button only.
+type: button
+# Greys it out and stops it responding. Button only.
+disabled: false
+# What kind of button it is.
+#   main — a labelled button (default)
+#   link — text on a rule that travels across on hover
+#   play, close, arrow — a mark on its own, with a label for anyone who cannot see it
+variant: main
+# How much weight the button carries. Not for `link`, which is already the quietest.
+#   primary — filled, for the main action (default)
+#   secondary — outlined, for anything sitting beside a primary
+emphasis: primary
+# What the control does, for anyone who cannot see its mark. play, close, arrow only.
+# Defaults to Abspielen/Pause, Schließen, or Weiter/Zurück.
+label: null
+# Whether it is playing: shows the pause mark, and reads as pressed. play only.
+pressed: false
+# Which way the arrow points: forward or back. arrow only.
+direction: forward
+class: null
+# Extra attributes, written out as-is (`data-step="1"`). Templates only — never editor input.
+attrs: null
+---
+{{ _pressed = view:pressed | to_bool }}{{ _disabled = view:disabled | to_bool }}
+{{ _written = view:variant == 'main' || view:variant == 'link' }}
+{{ if !_written || (slot | trim) }}
+{{ _tag = view:element == 'link' ? 'a' : 'button' }}
+{{ if view:variant == 'play' }}{{ _named = _pressed ? 'Pause' : 'Abspielen' }}{{ elseif view:variant == 'close' }}{{ _named = 'Schließen' }}{{ else }}{{ _named = view:direction == 'back' ? 'Zurück' : 'Weiter' }}{{ /if }}
+<{{ _tag }} class="button_wrap{{ if view:emphasis != 'primary' }} {{ view:emphasis }}{{ /if }}{{ if view:variant != 'main' }} {{ view:variant }}{{ /if }}{{ if view:variant == 'arrow' && view:direction == 'back' }} back{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}"
+    {{ if _tag == 'a' }}href="{{ view:href ?? '#' }}"{{ else }}{{ if view:type != 'submit' }}type="{{ view:type }}"{{ /if }}{{ if _disabled }} disabled{{ /if }}{{ /if }}
+    {{ unless _written }}aria-label="{{ view:label ?? _named }}"{{ /unless }}
+    {{ if view:variant == 'play' }}aria-pressed="{{ _pressed ? 'true' : 'false' }}"{{ /if }}{{ if view:attrs }} {{ view:attrs }}{{ /if }}>
+    {{ if _written }}<span class="button_text text-style-trim">{{ slot | trim }}</span>{{ /if }}
+    {{ if view:variant == 'play' }}
+        {{ partial:components/icon name="play" variant="small" class="button_mark button_play" }}
+        {{ partial:components/icon name="pause" variant="small" class="button_mark button_pause" }}
+    {{ elseif view:variant == 'close' || view:variant == 'arrow' }}
+        {{ partial:components/icon :name="view:variant == 'close' ? 'close' : 'arrow-full'" variant="small" class="button_mark" }}
+    {{ /if }}
+</{{ _tag }}>
+{{ /if }}

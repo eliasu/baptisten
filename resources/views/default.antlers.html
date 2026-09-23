@@ -1,1 +1,15 @@
-{{ content }}
+{{# Every block is one section. The section's settings are decided here, not
+    by the editor: the only choice they get is `background`. #}}
+{{ _padding_top = ['hero' => 'large'] }}
+{{ _padding_bottom = ['hero' => 'large'] }}
+{{ _overlap = nav_overlap | to_bool }}
+{{ blocks }}
+    {{ _top = (first && _overlap) ? 'navoverlap' : (_padding_top[type] ?? 'medium') }}
+    {{ partial:components/section
+        :theme="background == 'dark' ? 'dark' : 'light'"
+        :padding_top="_top"
+        :padding_bottom="_padding_bottom[type] ?? 'medium'"
+    }}
+        {{ partial src="sets/{type}" }}
+    {{ /partial:components/section }}
+{{ /blocks }}

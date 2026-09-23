@@ -1,0 +1,221 @@
+.nav_wrap {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-inline: var(--site-margin);
+  background-color: var(--background);
+  color: var(--text);
+  border-bottom: var(--border-width) solid var(--border);
+
+  &.overlap {
+    position: fixed;
+    inset-inline: 0;
+  }
+}
+
+.nav_inner {
+  width: 100%;
+  max-width: var(--max-width-main);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 var(--space-6);
+}
+
+/* Bar height */
+.nav_logo,
+.nav_toggle {
+  min-height: var(--nav-height);
+}
+
+/* Statamic port: the wordmark is text, not an SVG, so it takes a type size
+   rather than a width. */
+.nav_logo {
+  display: flex;
+  align-items: center;
+  font-size: var(--h5);
+  font-weight: var(--primary-bold);
+  letter-spacing: var(--letter-spacing-tight);
+  white-space: nowrap;
+  transition: opacity var(--hover-duration) var(--hover-ease);
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
+
+.nav_toggle {
+  --_icon-width: 1.5rem;
+  --_bar-gap: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  margin-right: calc((2.75rem - var(--_icon-width)) / -2);
+  color: inherit;
+  border-radius: var(--radius-small);
+  transition: opacity var(--hover-duration) var(--hover-ease);
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
+
+.nav_toggle_icon {
+  position: relative;
+  display: block;
+  width: var(--_icon-width);
+  height: calc(var(--_bar-gap) + var(--border-width));
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    height: var(--border-width);
+    background-color: currentcolor;
+    transition: transform var(--open-duration) var(--open-ease);
+  }
+  &::before {
+    top: 0;
+  }
+  &::after {
+    top: var(--_bar-gap);
+  }
+}
+
+.nav_wrap.open .nav_toggle_icon {
+  &::before {
+    transform: translateY(calc(var(--_bar-gap) / 2)) rotate(45deg);
+  }
+  &::after {
+    transform: translateY(calc(var(--_bar-gap) / -2)) rotate(-45deg);
+  }
+}
+
+.nav_menu {
+  position: absolute;
+  top: 100%;
+  inset-inline: 0;
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  max-height: calc(100svh - var(--nav-height));
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: var(--background);
+  border-bottom: var(--border-width) solid var(--border);
+  transition:
+    grid-template-rows var(--open-duration) var(--open-ease),
+    visibility var(--open-duration) var(--open-ease);
+}
+
+.nav_menu_inner {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--open-duration) var(--open-ease);
+}
+
+.nav_wrap.open .nav_menu {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.nav_wrap.open .nav_menu_inner {
+  opacity: 1;
+  overflow-y: auto;
+}
+
+.nav_links {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--site-margin) var(--space-4);
+  font-size: var(--text-main);
+  font-weight: var(--primary-medium);
+  & > li + li {
+    border-top: var(--border-width) solid var(--border);
+  }
+}
+
+.nav_link {
+  display: block;
+  padding-block: var(--space-3);
+  color: color-mix(in lab, currentcolor 60%, transparent);
+  text-decoration: none;
+  text-underline-offset: 0.4em;
+  text-decoration-thickness: var(--border-width);
+  transition: color var(--hover-duration) var(--hover-ease);
+  &[aria-current="page"] {
+    color: var(--text);
+  }
+  @media (hover: hover) {
+    &:hover {
+      color: var(--text);
+    }
+  }
+}
+
+@media (width >= 48rem) {
+  .nav_toggle {
+    display: none;
+  }
+
+  .nav_menu {
+    position: static;
+    display: block;
+    visibility: visible;
+    background-color: transparent;
+    border-bottom: 0;
+  }
+
+  .nav_menu_inner {
+    overflow: visible;
+    opacity: 1;
+  }
+
+  .nav_links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 0;
+    gap: var(--space-4);
+    font-size: var(--text-small);
+    & > li + li {
+      border-top: 0;
+    }
+  }
+
+  .nav_link {
+    padding-block: 0;
+    &[aria-current="page"] {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* Statamic port: a second row under the bar, for the two things the church
+   says on every page. */
+.nav_notices {
+  width: 100%;
+  max-width: var(--max-width-main);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  padding-block: var(--space-2);
+  border-top: var(--border-width) solid var(--border);
+  color: var(--accent);
+}
+
+.nav_notice {
+  font-size: var(--text-tiny);
+  font-weight: var(--primary-bold);
+  line-height: var(--line-height-large);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

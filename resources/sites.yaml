@@ -1,0 +1,5 @@
+default:
+  name: 'baptisten.schöneberg'
+  url: /
+  locale: de_DE
+  lang: de

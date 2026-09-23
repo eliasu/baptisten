@@ -1,0 +1,21 @@
+---
+# What the text is written as: span, p or h1–h6. The type style is fixed
+# whichever is chosen, so a label can take a heading level — where it titles
+# the section that follows it — or `span`, where it is part of a sentence,
+# without changing how it looks.
+tag: p
+# How the label is drawn.
+#   default — the text on its own, in the accent colour (default)
+#   marker — a rule beside the text
+#   tag — the text in a filled pill
+# Statamic port: upstream's default carries the marker. Every label in this
+# design is plain, so the marker became the opt-in.
+variant: default
+class: null
+---
+{{ if slot | trim }}
+<div class="eyebrow_wrap{{ if view:variant != 'default' }} {{ view:variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ if view:variant == 'marker' }}<span class="eyebrow_marker" aria-hidden="true"></span>{{ /if }}
+    <{{ view:tag }} class="eyebrow_text text-style-tiny">{{ slot | trim }}</{{ view:tag }}>
+</div>
+{{ /if }}

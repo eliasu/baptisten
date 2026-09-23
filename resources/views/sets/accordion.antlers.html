@@ -1,0 +1,8 @@
+{{ partial:components/content-wrapper }}
+    {{ partial:components/heading tag="h2" }}{{ heading }}{{ /partial:components/heading }}
+{{ /partial:components/content-wrapper }}
+{{ partial:components/accordion }}
+    {{ items scope="item" }}
+        {{ partial:components/accordion-item :heading="item:question" }}{{ item:answer }}{{ /partial:components/accordion-item }}
+    {{ /items }}
+{{ /partial:components/accordion }}

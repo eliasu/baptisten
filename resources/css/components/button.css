@@ -1,0 +1,87 @@
+.button_wrap {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.75em 1.5em;
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border: var(--border-width) solid var(--button-border);
+  border-radius: var(--radius-small);
+  line-height: 1.2;
+  text-decoration: none;
+  text-align: center;
+  transition:
+    background-color var(--hover-duration) var(--hover-ease),
+    color var(--hover-duration) var(--hover-ease),
+    border-color var(--hover-duration) var(--hover-ease);
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--button-background-hover);
+      color: var(--button-text-hover);
+      border-color: var(--button-border-hover);
+    }
+  }
+  &.secondary {
+    --button-background: var(--button-2-background);
+    --button-text: var(--button-2-text);
+    --button-border: var(--button-2-border);
+    --button-background-hover: var(--button-2-background-hover);
+    --button-text-hover: var(--button-2-text-hover);
+    --button-border-hover: var(--button-2-border-hover);
+  }
+  &.link {
+    --button-background: transparent;
+    --button-text: var(--link-text);
+    --button-border: var(--link-border);
+    --button-background-hover: transparent;
+    --button-text-hover: var(--link-text-hover);
+    --button-border-hover: var(--link-border);
+
+    padding: 0.4em 0;
+    border: 0;
+    border-bottom: var(--border-width) solid var(--button-border);
+    border-radius: 0;
+    background-image: linear-gradient(
+      var(--link-border-hover),
+      var(--link-border-hover)
+    );
+    background-repeat: no-repeat;
+    background-origin: border-box;
+    background-position: 100% 100%;
+    background-size: 0 var(--border-width);
+    transition:
+      background-size calc(var(--hover-duration) * 2) var(--hover-ease),
+      color var(--hover-duration) var(--hover-ease),
+      border-color var(--hover-duration) var(--hover-ease);
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background-position: 0 100%;
+        background-size: 100% var(--border-width);
+      }
+    }
+  }
+  &:is(.play, .close, .arrow) {
+    gap: 0;
+    padding: 0.75em;
+    border-radius: var(--radius-round);
+  }
+  &.back .button_mark {
+    rotate: 180deg;
+  }
+  &.play .button_pause {
+    display: none;
+  }
+  &.play[aria-pressed="true"] {
+    & .button_play {
+      display: none;
+    }
+    & .button_pause {
+      display: block;
+    }
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

@@ -1,0 +1,19 @@
+---
+# The text on the control that opens it.
+label: null
+class: null
+---
+{{# JS: resources/js/components/dropdown.ts #}}
+{{ if view:label && (slot | trim) }}
+<details class="dropdown_wrap{{ if view:class }} {{ view:class }}{{ /if }}">
+    <summary class="dropdown_toggle">
+        <span class="dropdown_label text-style-trim">{{ view:label }}</span>
+        {{ partial:components/icon name="arrow" variant="small" class="dropdown_icon" }}
+    </summary>
+    <div class="dropdown_content">
+        <div class="dropdown_body margin-trim">
+            {{ slot | trim }}
+        </div>
+    </div>
+</details>
+{{ /if }}

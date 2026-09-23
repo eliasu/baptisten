@@ -1,0 +1,32 @@
+---
+# The small label above the title. Nothing renders without one.
+eyebrow: null
+# The title. Inline markup is rendered.
+heading: null
+# Heading level, for the page outline. The size is fixed.
+heading_tag: h2
+# The quiet note opposite the label, across the top rule of the block.
+note: null
+# Longest line, in characters, before the title wraps. Unset, it fills its column.
+max_width: null
+class: null
+---
+{{# The heading every section on the home page opens with: a label and a note
+    on one line, the title under it. #}}
+{{ if (view:eyebrow | trim) || (view:heading | trim) }}
+<div class="section-heading_wrap{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ if (view:eyebrow | trim) || (view:note | trim) }}
+    <div class="section-heading_index">
+        {{ if view:eyebrow | trim }}
+            {{ partial:components/eyebrow }}{{ view:eyebrow }}{{ /partial:components/eyebrow }}
+        {{ /if }}
+        {{ if view:note | trim }}
+            <p class="section-heading_note text-style-tiny">{{ view:note }}</p>
+        {{ /if }}
+    </div>
+    {{ /if }}
+    {{ if view:heading | trim }}
+        {{ partial:components/heading :tag="view:heading_tag" :max_width="view:max_width" }}{{ view:heading }}{{ /partial:components/heading }}
+    {{ /if }}
+</div>
+{{ /if }}

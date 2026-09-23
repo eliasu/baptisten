@@ -1,0 +1,17 @@
+{{ partial:components/content-wrapper }}
+    {{ partial:components/heading tag="h2" }}{{ heading }}{{ /partial:components/heading }}
+    {{ partial:components/paragraph variant="large" max_width="52" }}{{ text | nl2br }}{{ /partial:components/paragraph }}
+{{ /partial:components/content-wrapper }}
+{{ partial:components/grid variant="autofit" min_column_width="18" }}
+    {{ cards scope="card" }}
+        {{ partial:components/card
+            :eyebrow="card:eyebrow"
+            :heading="card:heading"
+            :text="card:text"
+            :button_label="card:link_label"
+            :button_href="card:link"
+            :image="card:image"
+            :variant="card:image ? 'stacked' : 'default'"
+        }}
+    {{ /cards }}
+{{ /partial:components/grid }}

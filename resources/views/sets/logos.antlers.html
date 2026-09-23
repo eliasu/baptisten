@@ -1,0 +1,6 @@
+{{ partial:components/marquee }}
+    {{ images }}
+        {{ _logo = ['id' => id, 'url' => url, 'width' => width, 'height' => height, 'alt' => alt, 'extension' => extension] }}
+        {{ partial:components/img :image="_logo" variant="densities" width="160" transparent="true" }}
+    {{ /images }}
+{{ /partial:components/marquee }}

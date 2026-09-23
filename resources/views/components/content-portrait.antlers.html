@@ -1,0 +1,29 @@
+---
+# The photograph. An asset, or a path/URL. Nothing renders without one.
+image: null
+# Leave unset to fall back to the asset's own alt field.
+image_alt: null
+# Height of the photograph, in rem. Defaults to the design's smaller portrait.
+height: 18.75
+# The person's name.
+name: null
+# What they do here.
+role: null
+class: null
+---
+{{# One person: photograph, name, role. #}}
+{{ if view:image || (view:name | trim) }}
+<div class="portrait_wrap{{ if view:class }} {{ view:class }}{{ /if }}" style="--_height: {{ view:height }}rem;">
+    {{ if view:image }}
+    <div class="portrait_visual">
+        {{ partial:components/img :image="view:image" :alt="view:image_alt" }}
+    </div>
+    {{ /if }}
+    {{ if view:name | trim }}
+        <p class="portrait_name">{{ view:name }}</p>
+    {{ /if }}
+    {{ if view:role | trim }}
+        <p class="portrait_role text-style-small">{{ view:role }}</p>
+    {{ /if }}
+</div>
+{{ /if }}

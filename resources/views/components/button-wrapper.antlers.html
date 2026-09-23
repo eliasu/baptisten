@@ -1,0 +1,10 @@
+---
+# Space above the wrapper: 0–8 or auto. `default` leaves the pattern's own margin in place.
+margin_top: default
+class: null
+---
+{{ if slot | trim }}
+<div class="button-wrapper{{ if view:margin_top != 'default' }} margin-top-{{ view:margin_top }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ slot | trim }}
+</div>
+{{ /if }}

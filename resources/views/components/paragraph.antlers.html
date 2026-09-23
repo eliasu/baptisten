@@ -1,0 +1,15 @@
+---
+# The element the text is written as: p, span or div.
+tag: p
+# Type style.
+#   display, h1–h6 — the heading sizes
+#   large, main, small — the body sizes
+#   inherit — take the style from its surroundings (default)
+variant: inherit
+# Longest line, in characters, before the text wraps. Unset, it fills its column.
+max_width: null
+class: null
+---
+{{ if slot | trim }}
+<{{ view:tag }} class="text{{ if view:variant != 'inherit' }} text-style-{{ view:variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}"{{ if view:max_width }} style="--_mw: {{ view:max_width }}ch;"{{ /if }}>{{ slot | trim }}</{{ view:tag }}>
+{{ /if }}

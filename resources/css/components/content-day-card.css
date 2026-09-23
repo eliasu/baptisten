@@ -1,0 +1,34 @@
+.day-card_wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: var(--border-width) solid var(--border);
+
+  /* The gap above sets the rhythm here, not each style's own margin. */
+  > [class] {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+.day-card_marker {
+  color: var(--accent);
+  font-family: var(--secondary-family);
+  font-weight: var(--secondary-semibold);
+  font-size: var(--h2);
+  line-height: var(--line-height-small);
+  letter-spacing: var(--letter-spacing-normal);
+  --_trim-top: var(--secondary-trim-top);
+  --_trim-bottom: var(--secondary-trim-bottom);
+}
+
+/* The line under the title closes the card, whatever height the row grows to.
+   Written through the wrap so it outranks the margin reset there. */
+.day-card_wrap > .day-card_text {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  color: var(--text-2);
+}

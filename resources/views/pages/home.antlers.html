@@ -1,0 +1,208 @@
+{{# Hand-built page (CMS mode A). Every setting below is a decision made here,
+    not in the control panel. The client fills the fields; the theme, spacing
+    and sizes are fixed.
+
+    The page alternates its two light surfaces — the cream `--background` a
+    section carries by default, and the white `--background-2` the
+    `background-2` utility swaps in. #}}
+
+{{# Kopfbereich #}}
+{{ partial:components/section padding_top="small" gap="5" }}
+    {{ partial:components/content-wrapper }}
+        {{ partial:components/eyebrow }}{{ eyebrow }}{{ /partial:components/eyebrow }}
+        {{ partial:components/heading tag="h1" variant="display" max_width="22" }}{{ heading }}{{ /partial:components/heading }}
+        {{ partial:components/paragraph variant="large" max_width="44" }}{{ text | nl2br }}{{ /partial:components/paragraph }}
+        {{# The note and the buttons share one row, so `button-wrapper` holds
+            both rather than the buttons alone. #}}
+        {{ partial:components/button-wrapper }}
+            {{ partial:components/paragraph class="weight-bold" }}{{ callout }}{{ /partial:components/paragraph }}
+            {{ buttons scope="button" }}
+                {{ partial:components/button element="link" :href="button:link:url ?? button:link" :emphasis="first ? 'primary' : 'secondary'" }}{{ button:label }}{{ /partial:components/button }}
+            {{ /buttons }}
+        {{ /partial:components/button-wrapper }}
+    {{ /partial:components/content-wrapper }}
+    {{ partial:components/img :image="image" loading="eager" fetch_priority="high" :width="1296" :height="540" }}
+{{ /partial:components/section }}
+
+{{# Einstieg & Gottesdienst #}}
+{{ partial:components/section class="background-2" }}
+    {{ partial:components/content-wrapper variant="columns" }}
+        {{ partial:components/content-section-heading
+            :eyebrow="service_eyebrow"
+            :heading="service_heading"
+            note="baptisten.schöneberg / Archiv"
+            max_width="15"
+        }}
+        {{ partial:components/paragraph }}{{ service_text | nl2br }}{{ /partial:components/paragraph }}
+        {{ partial:sets/_buttons :items="service_buttons" }}
+
+        {{ slot:column2 }}
+            {{ partial:components/content-index-list }}
+                {{ service_facts scope="fact" }}
+                    {{ partial:components/content-index-item
+                        marker_variant="large"
+                        :marker="fact:marker"
+                        :eyebrow="fact:label"
+                        :heading="fact:title"
+                    }}
+                {{ /service_facts }}
+            {{ /partial:components/content-index-list }}
+        {{ /slot:column2 }}
+    {{ /partial:components/content-wrapper }}
+{{ /partial:components/section }}
+
+{{# Demnächst #}}
+{{ if events }}
+{{ partial:components/section gap="6" }}
+    {{ partial:components/content-section-heading
+        :eyebrow="events_eyebrow"
+        :heading="events_heading"
+        note="baptisten.schöneberg / Archiv"
+    }}
+    {{ partial:components/content-index-list variant="boxed" }}
+        {{ events scope="event" }}
+            {{ _num = count < 10 ? '0{count}' : '{count}' }}
+            {{ partial:components/content-index-item
+                :marker="_num"
+                :eyebrow="event:label"
+                :heading="event:title"
+                :link_label="event:link_label"
+                :link_href="event:link:url ?? event:link"
+            }}
+        {{ /events }}
+    {{ /partial:components/content-index-list }}
+{{ /partial:components/section }}
+{{ /if }}
+
+{{# Regelmäßige Termine #}}
+{{ if recurring }}
+{{ partial:components/section gap="6" class="background-2" }}
+    {{ partial:components/content-section-heading
+        :eyebrow="recurring_eyebrow"
+        :heading="recurring_heading"
+        note="baptisten.schöneberg / Archiv"
+    }}
+    {{ partial:components/grid variant="autofit" min_column_width="17" }}
+        {{ recurring scope="item" }}
+            {{ partial:components/content-day-card
+                :marker="item:day"
+                :eyebrow="item:label"
+                :heading="item:title"
+                :text="item:text"
+            }}
+        {{ /recurring }}
+    {{ /partial:components/grid }}
+{{ /partial:components/section }}
+{{ /if }}
+
+{{# Angebote #}}
+{{ if offers }}
+{{ partial:components/section theme="dark" }}
+    {{ partial:components/content-wrapper variant="columns" }}
+        {{ partial:components/content-section-heading
+            :eyebrow="offers_eyebrow"
+            :heading="offers_heading"
+            note="baptisten.schöneberg / Archiv"
+        }}
+        {{ slot:column2 }}
+            {{ partial:components/content-index-list }}
+                {{ offers scope="offer" }}
+                    {{ _num = count < 10 ? '0{count}' : '{count}' }}
+                    {{ partial:components/content-index-item
+                        :marker="_num"
+                        :eyebrow="offer:label"
+                        :heading="offer:title"
+                        :text="offer:text"
+                    }}
+                {{ /offers }}
+            {{ /partial:components/content-index-list }}
+        {{ /slot:column2 }}
+    {{ /partial:components/content-wrapper }}
+{{ /partial:components/section }}
+{{ /if }}
+
+{{# Team #}}
+{{ partial:components/section gap="6" class="background-2" }}
+    {{ partial:components/content-section-heading
+        :eyebrow="team_eyebrow"
+        :heading="team_heading"
+        note="baptisten.schöneberg / Archiv"
+    }}
+    {{ partial:components/content-wrapper variant="columns" }}
+        {{ partial:components/heading tag="p" variant="h3" }}{{ team_lead | nl2br }}{{ /partial:components/heading }}
+        {{ slot:column2 }}
+            {{ partial:components/paragraph }}{{ team_text | nl2br }}{{ /partial:components/paragraph }}
+        {{ /slot:column2 }}
+    {{ /partial:components/content-wrapper }}
+
+    {{# The first two stand large, the rest fall into a tighter row below. #}}
+    {{ if team }}
+    {{ partial:components/grid large="2" }}
+        {{ team scope="person" limit="2" }}
+            {{ partial:components/content-portrait
+                :image="person:image"
+                :name="person:name"
+                :role="person:role"
+                :height="22.5"
+            }}
+        {{ /team }}
+    {{ /partial:components/grid }}
+    {{ /if }}
+    {{ partial:components/grid small="2" large="4" }}
+        {{ team scope="person" offset="2" }}
+            {{ partial:components/content-portrait
+                :image="person:image"
+                :name="person:name"
+                :role="person:role"
+            }}
+        {{ /team }}
+    {{ /partial:components/grid }}
+{{ /partial:components/section }}
+
+{{# Einblicke #}}
+{{ if insights }}
+{{ partial:components/section }}
+    {{ partial:components/grid large="2" }}
+        {{ insights scope="item" }}
+            {{ partial:components/card
+                heading_variant="h3"
+                :eyebrow="item:label"
+                :heading="item:title"
+                :text="item:text"
+                :button_label="item:link_label"
+                :button_href="item:link:url ?? item:link"
+                :theme="first ? 'light' : 'dark'"
+            }}
+        {{ /insights }}
+    {{ /partial:components/grid }}
+{{ /partial:components/section }}
+{{ /if }}
+
+{{# Spenden #}}
+{{ partial:components/section theme="brand" }}
+    {{ partial:components/content-wrapper variant="columns" }}
+        {{ partial:components/eyebrow }}{{ donation_eyebrow }}{{ /partial:components/eyebrow }}
+        {{ partial:components/heading tag="h2" variant="h1" max_width="14" }}{{ donation_heading }}{{ /partial:components/heading }}
+        {{ slot:column2 }}
+            {{ partial:components/paragraph variant="large" }}{{ donation_text | nl2br }}{{ /partial:components/paragraph }}
+            {{ partial:sets/_buttons :items="donation_buttons" }}
+        {{ /slot:column2 }}
+    {{ /partial:components/content-wrapper }}
+{{ /partial:components/section }}
+
+{{# Besuch — the photograph runs off the right edge, so the section carries no
+    side padding of its own and the content wrapper breaks out. #}}
+{{ partial:components/section padding_top="none" padding_bottom="none" class="background-2" }}
+    {{ partial:components/content-wrapper variant="breakout" fill="true" }}
+        {{ partial:components/eyebrow }}{{ visit_eyebrow }}{{ /partial:components/eyebrow }}
+        {{ partial:components/heading tag="h2" max_width="18" }}{{ visit_heading }}{{ /partial:components/heading }}
+        {{ partial:components/paragraph class="weight-bold" }}{{ visit_organisation }}{{ /partial:components/paragraph }}
+        {{ partial:components/paragraph }}{{ visit_address | nl2br }}{{ /partial:components/paragraph }}
+        {{ partial:sets/_buttons :items="visit_buttons" }}
+        {{ partial:components/paragraph variant="small" class="weight-bold" }}{{ visit_social }}{{ /partial:components/paragraph }}
+
+        {{ slot:column2 }}
+            {{ partial:components/img :image="visit_image" :width="860" :height="620" }}
+        {{ /slot:column2 }}
+    {{ /partial:components/content-wrapper }}
+{{ /partial:components/section }}

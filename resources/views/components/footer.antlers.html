@@ -1,0 +1,25 @@
+---
+# Handle of the Statamic navigation that fills the footer links.
+navigation: footer
+---
+{{# Statamic port: links come from a navigation, and the year is rendered
+    server-side, so upstream's year script isn't needed. #}}
+<footer class="footer_wrap theme-dark">
+    <div class="footer_inner">
+        <div class="footer_top">
+            <a class="footer_logo" href="/">{{ site:name }}</a>
+            <nav aria-label="Fußzeile">
+                <ul class="footer_links">
+                    {{ nav :handle="view:navigation" max_depth="1" }}
+                        <li><a class="footer_link" href="{{ url }}">{{ title }}</a></li>
+                    {{ /nav }}
+                </ul>
+            </nav>
+        </div>
+        <div class="footer_bottom">
+            <p class="footer_copyright text-style-small">&copy; {{ now format="Y" }}&#160;|&#160;{{ site:name }}</p>
+            {{# Said on every page, so it lives here rather than in a field. #}}
+            <p class="footer_statement text-style-tiny">Offen. Vielfältig. Mitten in Berlin.</p>
+        </div>
+    </div>
+</footer>

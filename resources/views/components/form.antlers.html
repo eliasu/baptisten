@@ -1,0 +1,49 @@
+---
+# Handle of the Statamic form to render. Its blueprint decides the fields.
+# Lumos: `name`.
+handle: null
+# Shown in place of the fields once it has sent.
+success_message: Danke — wir melden uns.
+# Shown beneath the fields when it could not send.
+error_message: Das hat nicht geklappt. Bitte versuchen Sie es erneut.
+# Label of the submit button.
+submit_label: Absenden
+class: null
+---
+{{# Statamic port: fields come from the form's blueprint, not from a slot.
+    text → input (variant from input_type), textarea, select, radio/checkboxes
+    → fieldset of choices, range → range, toggle → toggle choice.
+    JS: resources/js/components/form.ts #}}
+{{ _variants = ['email' => 'email', 'tel' => 'phone', 'url' => 'url', 'number' => 'number', 'date' => 'date', 'password' => 'password', 'search' => 'search'] }}
+{{ if view:handle }}
+<div class="form_wrap{{ if view:class }} {{ view:class }}{{ /if }}" data-state="idle">
+    {{ form:create :in="view:handle" class="form_fields" }}
+        <input type="text" name="{{ honeypot }}" hidden tabindex="-1" autocomplete="off">
+        {{ fields }}
+            {{ _required = validate | in_array('required') }}
+            {{ if type == 'textarea' }}
+                {{ partial:components/textarea :label="display" :name="handle" :placeholder="placeholder" :required="_required" }}
+            {{ elseif type == 'select' }}
+                {{ partial:components/select :label="display" :name="handle" :options="options" :required="_required" }}
+            {{ elseif type == 'radio' || type == 'checkboxes' }}
+                {{ partial:components/fieldset :legend="display" :variant="inline ? 'inline' : 'stack'" legend_style="label" }}
+                    {{ foreach :array="options" }}
+                        {{ partial:components/choice :type="type == 'radio' ? 'radio' : 'checkbox'" :name="type == 'radio' ? handle : (handle + '[]')" :value="key" :label="value" }}
+                    {{ /foreach }}
+                {{ /partial:components/fieldset }}
+            {{ elseif type == 'range' }}
+                {{ partial:components/range :label="display" :name="handle" :min="min ?? 0" :max="max ?? 100" :step="step ?? 1" :unit="append" :required="_required" }}
+            {{ elseif type == 'toggle' }}
+                {{ partial:components/choice variant="toggle" :name="handle" value="1" :label="display" }}
+            {{ else }}
+                {{ partial:components/input :label="display" :name="handle" :variant="_variants[input_type] ?? 'text'" :placeholder="placeholder" :required="_required" }}
+            {{ /if }}
+        {{ /fields }}
+        {{ partial:components/button-wrapper }}
+            {{ partial:components/button type="submit" }}{{ view:submit_label }}{{ /partial:components/button }}
+        {{ /partial:components/button-wrapper }}
+    {{ /form:create }}
+    <p class="form_note form_note-sent text-style-main" role="status">{{ view:success_message }}</p>
+    <p class="form_note form_note-failed text-style-main" role="alert">{{ view:error_message }}</p>
+</div>
+{{ /if }}

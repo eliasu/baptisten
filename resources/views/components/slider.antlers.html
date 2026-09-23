@@ -1,0 +1,34 @@
+---
+# What the slides hold, for anyone who cannot see them.
+label: Galerie
+# How far the slides run past the container.
+#   bleed — off both edges of the screen (default)
+#   crop-start — flush at the start, off the end
+#   contained — within the container on both sides
+variant: bleed
+# Slides in view below 30rem, the base every larger size falls back to. Must be greater than 0.
+xsmall: 1.02
+# Slides in view from 30rem up. Inherits xsmall when unset.
+small: null
+# Slides in view from 48rem up. Inherits small when unset.
+medium: null
+# Slides in view from 64rem up. Inherits medium when unset.
+large: null
+class: null
+---
+{{# Default slot: one element per slide. JS: resources/js/components/slider.ts #}}
+{{ if slot | trim }}
+{{ _style = (view:xsmall != 1.02 && view:xsmall > 0 ? '--_visible-xs: {view:xsmall}; ' : '') + (view:small > 0 ? '--_visible-sm: {view:small}; ' : '') + (view:medium > 0 ? '--_visible-md: {view:medium}; ' : '') + (view:large > 0 ? '--_visible-lg: {view:large};' : '') }}
+<div class="slider_wrap{{ if view:variant != 'bleed' }} {{ view:variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}"{{ if _style | trim }} style="{{ _style | trim }}"{{ /if }}>
+    <div class="slider_list" role="group" aria-label="{{ view:label }}" tabindex="0">
+        {{ slot | trim }}
+    </div>
+    <div class="slider_controls">
+        <div class="slider_markers"></div>
+        <div class="slider_steps">
+            {{ partial:components/button variant="arrow" emphasis="secondary" direction="back" label="Vorheriger Slide" attrs='data-step="-1"' }}
+            {{ partial:components/button variant="arrow" emphasis="secondary" label="Nächster Slide" attrs='data-step="1"' }}
+        </div>
+    </div>
+</div>
+{{ /if }}

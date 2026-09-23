@@ -1,0 +1,39 @@
+---
+# The text above the track.
+label: null
+# Where the handle starts. Defaults to halfway.
+value: null
+# The lowest it goes.
+min: 0
+# The highest it goes.
+max: 100
+# How far it moves at a time.
+step: 1
+# What the number is measured in, shown after it.
+unit: null
+# The name it submits under. Taken from the label where it is not set.
+name: null
+# Marks the field as needed, and stars its label.
+required: false
+class: null
+---
+{{# JS: resources/js/components/range.ts #}}
+{{ if view:label }}
+{{ _start = view:value ?? (((view:min + view:max) / 2) | round) }}
+{{ _progress = view:max == view:min ? 0 : ((_start - view:min) / (view:max - view:min)) }}
+{{ _field_id = 'range-' + (view:label | slugify) }}
+<div class="field form-range{{ if view:class }} {{ view:class }}{{ /if }}" style="--_progress: {{ _progress }};">
+    <label class="field-label text-style-main" for="{{ _field_id }}">
+        <span>{{ view:label }}</span>{{ if view:required | to_bool }}<span class="field-star" aria-hidden="true">*</span>{{ /if }}
+    </label>
+    <span class="form-range_control">
+        <input class="form-range_input" type="range" id="{{ _field_id }}" name="{{ view:name ?? (view:label | slugify) }}" min="{{ view:min }}" max="{{ view:max }}" step="{{ view:step }}" value="{{ _start }}"{{ if view:required | to_bool }} required{{ /if }}>
+        <span class="form-range_track" aria-hidden="true"></span>
+        <span class="form-range_fill" aria-hidden="true"></span>
+        <span class="form-range_handle" aria-hidden="true"></span>
+    </span>
+    <output class="form-range_output text-style-small" for="{{ _field_id }}">
+        <span class="form-range_value">{{ _start }}</span>{{ if view:unit }}<span>{{ view:unit }}</span>{{ /if }}
+    </output>
+</div>
+{{ /if }}

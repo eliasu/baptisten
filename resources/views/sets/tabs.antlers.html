@@ -1,0 +1,15 @@
+{{ partial:components/content-wrapper }}
+    {{ partial:components/heading tag="h2" }}{{ heading }}{{ /partial:components/heading }}
+{{ /partial:components/content-wrapper }}
+{{ partial:components/tabs }}
+    {{ slot:links }}
+        {{ items scope="item" }}{{ partial:components/tab-link }}{{ item:label }}{{ /partial:components/tab-link }}{{ /items }}
+    {{ /slot:links }}
+    {{ items scope="item" }}
+        {{ partial:components/content-wrapper :variant="item:image ? 'columns' : 'stack'" }}
+            {{ partial:components/heading tag="h3" }}{{ item:heading }}{{ /partial:components/heading }}
+            {{ partial:components/rich-text }}{{ item:text }}{{ /partial:components/rich-text }}
+            {{ if item:image }}{{ slot:column2 }}{{ partial:components/img :image="item:image" }}{{ /slot:column2 }}{{ /if }}
+        {{ /partial:components/content-wrapper }}
+    {{ /items }}
+{{ /partial:components/tabs }}

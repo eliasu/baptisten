@@ -1,0 +1,5 @@
+{{ partial:components/content-wrapper }}
+    {{ partial:components/heading tag="h2" }}{{ heading }}{{ /partial:components/heading }}
+    {{ partial:components/paragraph variant="large" max_width="52" }}{{ text | nl2br }}{{ /partial:components/paragraph }}
+    {{ partial:components/form :handle="form" }}
+{{ /partial:components/content-wrapper }}

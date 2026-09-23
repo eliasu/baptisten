@@ -1,0 +1,9 @@
+{{ partial:components/content-wrapper }}
+    {{ partial:components/heading tag="h2" }}{{ heading }}{{ /partial:components/heading }}
+{{ /partial:components/content-wrapper }}
+{{ partial:components/slider :label="heading ?? 'Galerie'" small="1.5" medium="2.5" large="3" }}
+    {{ images }}
+        {{ _picture = ['id' => id, 'url' => url, 'width' => width, 'height' => height, 'alt' => alt, 'extension' => extension] }}
+        {{ partial:components/img :image="_picture" variant="constrained" width="600" height="400" }}
+    {{ /images }}
+{{ /partial:components/slider }}

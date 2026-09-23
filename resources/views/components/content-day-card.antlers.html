@@ -1,0 +1,30 @@
+---
+# The weekday, set large in the display face. Nothing renders without one.
+marker: null
+# The small label under the marker.
+eyebrow: null
+# The card's title. Inline markup is rendered.
+heading: null
+# Heading level, for the page outline. The size is fixed.
+heading_tag: h3
+# One line under the title. Inline markup is rendered.
+text: null
+class: null
+---
+{{# A bordered panel led by a weekday, for anything that repeats. #}}
+{{ if (view:marker | trim) || (view:heading | trim) }}
+<div class="day-card_wrap{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ if view:marker | trim }}
+        <p class="day-card_marker" aria-hidden="true">{{ view:marker }}</p>
+    {{ /if }}
+    {{ if view:eyebrow | trim }}
+        {{ partial:components/eyebrow }}{{ view:eyebrow }}{{ /partial:components/eyebrow }}
+    {{ /if }}
+    {{ if view:heading | trim }}
+        {{ partial:components/heading :tag="view:heading_tag" variant="h5" }}{{ view:heading }}{{ /partial:components/heading }}
+    {{ /if }}
+    {{ if view:text | trim }}
+        {{ partial:components/paragraph variant="small" class="day-card_text" }}{{ view:text }}{{ /partial:components/paragraph }}
+    {{ /if }}
+</div>
+{{ /if }}

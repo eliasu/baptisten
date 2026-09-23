@@ -1,0 +1,45 @@
+---
+# Where the tabs sit against their panels.
+#   horizontal — in a row above them (default)
+#   side — in a column beside them
+variant: horizontal
+# How the panels advance, and everything that follows from it.
+#   manual — the reader advances them, and panels cross-fade (default)
+#   auto — they advance on their own and slide, with arrows, a play control and a progress line
+playback: manual
+# Id of the wrapper. Also the key the open tab is remembered under in the URL (?id=slug).
+id: null
+class: null
+---
+{{# Named slot `links`: one tab-link per panel. Default slot: one element per panel. JS: resources/js/components/tabs.ts #}}
+{{ _links = slot:links | trim }}{{ _panels = slot | trim }}
+{{ if _links && _panels }}
+{{ _auto = view:playback == 'auto' }}
+<div class="tabs_wrap{{ if view:variant != 'horizontal' }} {{ view:variant }}{{ /if }}{{ if _auto }} auto{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}"{{ if view:id }} id="{{ view:id }}"{{ /if }}>
+    <div class="tabs_bar">
+        <div class="tabs_links" role="tablist" aria-orientation="{{ view:variant == 'side' ? 'vertical' : 'horizontal' }}">
+            {{ _links }}
+        </div>
+    </div>
+    <div class="tabs_panels">
+        {{ _panels }}
+    </div>
+    {{ if _auto }}
+    <div class="tabs_controls">
+        <div class="tabs_steps">
+            {{ partial:components/button variant="arrow" emphasis="secondary" direction="back" label="Vorheriger Tab" attrs='data-step="-1"' }}
+            {{ partial:components/button variant="arrow" emphasis="secondary" label="Nächster Tab" attrs='data-step="1"' }}
+        </div>
+        {{ partial:components/button variant="play" emphasis="secondary" label="Automatischen Wechsel pausieren" pressed="true" attrs="data-toggle" }}
+    </div>
+    {{ /if }}
+</div>
+<noscript>
+    <style>
+        .tabs_bar, .tabs_controls { display: none; }
+        .tabs_wrap { grid-template-columns: none; }
+        .tabs_panels { gap: var(--space-6); overflow: visible; }
+        .tabs_panels > * { grid-area: auto; opacity: 1; visibility: visible; translate: none; }
+    </style>
+</noscript>
+{{ /if }}

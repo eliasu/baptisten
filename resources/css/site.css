@@ -1,3 +1,144 @@
-@import "tailwindcss";
-@source "../views";
-@source "../../content";
+/* Cascade order, lowest priority first */
+
+@layer base, patterns, components, utilities;
+
+@import "./lumos/base.css" layer(base);
+@import "./lumos/patterns.css" layer(patterns);
+@import "./lumos/utilities.css" layer(utilities);
+
+/* Components — one file per partial in resources/views/components */
+@import "./components/content-section-heading.css" layer(components);
+@import "./components/content-index-list.css" layer(components);
+@import "./components/content-day-card.css" layer(components);
+@import "./components/content-portrait.css" layer(components);
+@import "./components/accordion.css" layer(components);
+@import "./components/accordion-item.css" layer(components);
+@import "./components/button.css" layer(components);
+@import "./components/card.css" layer(components);
+@import "./components/choice.css" layer(components);
+@import "./components/content-wrapper.css" layer(components);
+@import "./components/dropdown.css" layer(components);
+@import "./components/eyebrow.css" layer(components);
+@import "./components/fieldset.css" layer(components);
+@import "./components/footer.css" layer(components);
+@import "./components/form.css" layer(components);
+@import "./components/grid.css" layer(components);
+@import "./components/icon.css" layer(components);
+@import "./components/marquee.css" layer(components);
+@import "./components/modal.css" layer(components);
+@import "./components/nav.css" layer(components);
+@import "./components/overlay.css" layer(components);
+@import "./components/range.css" layer(components);
+@import "./components/rich-text.css" layer(components);
+@import "./components/select.css" layer(components);
+@import "./components/skip-link.css" layer(components);
+@import "./components/slider.css" layer(components);
+@import "./components/tabs.css" layer(components);
+@import "./components/textarea.css" layer(components);
+
+/* Fonts — Astro's font API sets --font-* upstream; here it's plain @font-face.
+   Both families are variable, so one file covers every weight in use. */
+@font-face {
+  font-family: "DM Sans";
+  src: url("../fonts/dm-sans-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("../fonts/dm-sans-latin-ext.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("../fonts/cormorant-garamond-latin.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("../fonts/cormorant-garamond-latin-ext.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Additions to the token system. Changed values live in lumos/base.css; these
+   are tokens upstream has no slot for, so they go here and base.css stays
+   mergeable. See the lumos-extend-system skill. */
+@layer base {
+  :root {
+    --font-dm-sans: "DM Sans";
+
+    /* Second family: the Cormorant display sizes (display, h1-h3) */
+    --secondary-family: "Cormorant Garamond", Georgia, serif;
+    --secondary-regular: 400;
+    --secondary-semibold: 600;
+    /* A serif sits higher in its box than DM Sans, so it trims differently */
+    --secondary-trim-top: 0.44em;
+    --secondary-trim-bottom: 0.4em;
+
+    /* The accent orange is only 2.96:1 on cream — too low for the 12px
+       eyebrows. Flat fills keep --brand-500; accent *text* on a light
+       surface uses this darkened cut, which clears AA at 4.8:1. */
+    --accent-dark: #bc3d17;
+
+    /* One step below --text-small, for eyebrows and the archive note.
+       The design's 11-13px labels have nowhere else to go. */
+    --text-tiny: clamp(var(--text-tiny-min) / 16 * 1rem, ((var(--text-tiny-min) - ((var(--text-tiny-max) - var(--text-tiny-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-tiny-max) - var(--text-tiny-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-tiny-max) / 16 * 1rem);
+    --text-tiny-min: 11;
+    --text-tiny-max: 12;
+    --text-tiny-line-height: var(--line-height-large);
+    --text-tiny-letter-spacing: 0.06em;
+    --text-tiny-text-transform: uppercase;
+    --text-tiny-margin-top: var(--space-3);
+    --text-tiny-margin-bottom: var(--space-3);
+    --text-tiny-font-family: var(--primary-family);
+    --text-tiny-font-weight: var(--primary-bold);
+    --text-tiny-trim-top: var(--primary-trim-top);
+    --text-tiny-trim-bottom: var(--primary-trim-bottom);
+    --text-tiny-text-wrap: pretty;
+  }
+
+  .text-style-tiny {
+    font-family: var(--text-tiny-font-family);
+    font-size: var(--text-tiny);
+    font-weight: var(--text-tiny-font-weight);
+    line-height: var(--text-tiny-line-height);
+    letter-spacing: var(--text-tiny-letter-spacing);
+    text-transform: var(--text-tiny-text-transform);
+    text-wrap: var(--text-tiny-text-wrap);
+    --_trim-top: var(--text-tiny-trim-top);
+    --_trim-bottom: var(--text-tiny-trim-bottom);
+    --_margin-top: var(--text-tiny-margin-top);
+    --_margin-bottom: var(--text-tiny-margin-bottom);
+  }
+
+  /* The serif styles need the serif trim, not DM Sans' */
+  .text-style-display,
+  .text-style-h1,
+  h1,
+  .text-style-h2,
+  h2,
+  .text-style-h3,
+  h3 {
+    --_trim-top: var(--secondary-trim-top);
+    --_trim-bottom: var(--secondary-trim-bottom);
+  }
+}

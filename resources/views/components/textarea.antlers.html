@@ -1,0 +1,25 @@
+---
+# The text above the field.
+label: null
+# What the field starts out holding.
+value: null
+# The name it submits under. Taken from the label where it is not set.
+name: null
+# The text shown in an empty field.
+placeholder: null
+# How short it may be, in lines.
+min_lines: 3
+# How tall it grows to before it scrolls, in lines.
+max_lines: 12
+# Marks the field as needed, and stars its label.
+required: false
+class: null
+---
+{{ if view:label }}
+<label class="field form-textarea{{ if view:class }} {{ view:class }}{{ /if }}" style="--_min-lines: {{ view:min_lines }}; --_max-lines: {{ view:max_lines }};">
+    <span class="field-label text-style-main">
+        <span>{{ view:label }}</span>{{ if view:required | to_bool }}<span class="field-star" aria-hidden="true">*</span>{{ /if }}
+    </span>
+    <textarea class="field-control form-textarea_field text-style-main" name="{{ view:name ?? (view:label | slugify) }}"{{ if view:placeholder }} placeholder="{{ view:placeholder }}"{{ /if }}{{ if view:required | to_bool }} required{{ /if }} rows="{{ view:min_lines }}">{{ view:value }}</textarea>
+</label>
+{{ /if }}

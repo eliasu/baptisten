@@ -1,0 +1,43 @@
+---
+# Fix the nav over the page rather than letting it stick in flow, so the first
+# section starts underneath it. Give that section `padding_top="navoverlap"`
+# to clear the bar.
+overlap: false
+# Handle of the Statamic navigation that fills the menu.
+navigation: main
+---
+{{# Statamic port: the links come from a navigation, so NavLink is inlined
+    rather than being its own partial. The logo is the site name set in the
+    display face rather than an SVG, so it stays real text.
+    JS: resources/js/components/nav.ts #}}
+<header class="nav_wrap{{ if view:overlap | to_bool }} overlap{{ /if }}">
+    <div class="nav_inner">
+        <a class="nav_logo" href="/">{{ site:name }}</a>
+        <button class="nav_toggle" type="button" aria-label="Menü" aria-expanded="false" aria-controls="nav-menu">
+            <span class="nav_toggle_icon"></span>
+        </button>
+        <nav class="nav_menu" id="nav-menu" aria-label="Hauptnavigation">
+            <div class="nav_menu_inner">
+                <ul class="nav_links">
+                    {{ nav :handle="view:navigation" max_depth="1" }}
+                        <li><a class="nav_link" href="{{ url }}"{{ if is_current }} aria-current="page"{{ /if }}>{{ title }}</a></li>
+                    {{ /nav }}
+                </ul>
+            </div>
+        </nav>
+    </div>
+    {{# Said on every page, so it lives here rather than in a field. #}}
+    <p class="nav_notices">
+        <span class="nav_notice">&#9679;&#160;Sichere Gemeinde</span>
+        <span class="nav_notice">&#10038;&#160;LGBTQIA+ willkommen</span>
+    </p>
+</header>
+
+{{# No-JS fallback #}}
+<noscript>
+    <style>
+        .nav_toggle { display: none; }
+        .nav_menu { grid-template-rows: 1fr; visibility: visible; }
+        .nav_menu_inner { opacity: 1; }
+    </style>
+</noscript>

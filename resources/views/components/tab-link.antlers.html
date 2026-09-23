@@ -1,0 +1,6 @@
+---
+class: null
+---
+{{ if slot | trim }}
+<button class="tabs_link{{ if view:class }} {{ view:class }}{{ /if }}" type="button"><span class="tabs_link_text text-style-trim">{{ slot | trim }}</span></button>
+{{ /if }}

@@ -1,0 +1,3735 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lumos in Statamic</title>
+    <meta
+      name="description"
+      content="Handbuch zum Lumos-System in Statamic: Tokens, Themes, Cascade Layers, Antlers-Partials, Varianten, eigene Komponenten und das CMS."
+    />
+    <style>
+      /* ================================================================== *
+       * Tokens
+       * ================================================================== */
+      :root {
+        --paper: #fbfaf8;
+        --paper-2: #f4f1ec;
+        --paper-3: #e9e5dd;
+        --ink: #1b1917;
+        --ink-2: #4a453e;
+        --ink-3: #7c756b;
+        --rule: #ded9d0;
+        --rule-soft: #ebe7e0;
+        --accent: #b4441a;
+        --accent-soft: #fdefe8;
+        --good: #2f6a41;
+        --good-soft: #ecf4ee;
+        --bad: #a3321f;
+        --bad-soft: #fcedeb;
+        --code-bg: #f4f1ec;
+
+        --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino,
+          Georgia, serif;
+        --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", sans-serif;
+        --mono: ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Mono",
+          "JetBrains Mono", Menlo, Consolas, monospace;
+
+        --measure: 66ch;
+        --gap: 1.75rem;
+        --radius: 0.4rem;
+        --sidebar: 17.5rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --paper: #16151a;
+          --paper-2: #1e1d24;
+          --paper-3: #2a2830;
+          --ink: #edebf1;
+          --ink-2: #b8b4be;
+          --ink-3: #8b8694;
+          --rule: #322f3a;
+          --rule-soft: #262430;
+          --accent: #ff9068;
+          --accent-soft: #2c211d;
+          --good: #7fc394;
+          --good-soft: #1b241e;
+          --bad: #ef8b7c;
+          --bad-soft: #2a1d1d;
+          --code-bg: #1c1b21;
+        }
+      }
+
+      /* ================================================================== *
+       * Base
+       * ================================================================== */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        background-color: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: clamp(1.075rem, 1.03rem + 0.25vw, 1.2rem);
+        line-height: 1.72;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--serif);
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.012em;
+        text-wrap: balance;
+        margin: 0;
+      }
+
+      p,
+      ul,
+      ol,
+      table,
+      figure,
+      blockquote {
+        margin: 0;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.2em;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 0.85em;
+        background-color: var(--code-bg);
+        padding: 0.12em 0.35em;
+        border-radius: 0.25em;
+        overflow-wrap: break-word;
+      }
+
+      strong {
+        font-weight: 620;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+
+      .eyebrow {
+        font-family: var(--sans);
+        font-size: 0.75rem;
+        font-weight: 650;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        line-height: 1.3;
+      }
+
+      /* ================================================================== *
+       * Shell
+       * ================================================================== */
+      .shell {
+        max-width: 86rem;
+        margin-inline: auto;
+        padding-inline: 1.25rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        column-gap: 4rem;
+        align-items: start;
+      }
+
+      @media (width >= 64rem) {
+        .shell {
+          grid-template-columns: var(--sidebar) minmax(0, 1fr);
+          padding-inline: 2.5rem;
+        }
+      }
+
+      main {
+        min-width: 0;
+        padding-bottom: 7rem;
+      }
+
+      .prose {
+        max-width: var(--measure);
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap);
+      }
+
+      .prose > .wide,
+      .wide {
+        max-width: none;
+        width: min(100%, 62rem);
+      }
+
+      /* ================================================================== *
+       * Masthead
+       * ================================================================== */
+      .masthead {
+        grid-column: 1 / -1;
+        padding-block: 3.5rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+        max-width: 40rem;
+      }
+
+      .masthead h1 {
+        font-size: clamp(2.5rem, 1.8rem + 3.2vw, 4.2rem);
+      }
+
+      .masthead .lede {
+        font-size: 1.14em;
+        color: var(--ink-2);
+        max-width: 50ch;
+      }
+
+      .masthead .meta {
+        font-size: 0.85rem;
+        color: var(--ink-3);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem 1.25rem;
+        padding-top: 0.4rem;
+      }
+
+      /* ================================================================== *
+       * Overview
+       * ================================================================== */
+      .overview {
+        grid-column: 1 / -1;
+        border-top: 1px solid var(--rule);
+        border-bottom: 1px solid var(--rule);
+        padding-block: 2.5rem 3rem;
+        margin-bottom: 3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .overview h2 {
+        font-size: 1.5rem;
+      }
+
+      .parts {
+        display: grid;
+        gap: 2rem;
+      }
+
+      @media (width >= 52rem) {
+        .parts {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 2.5rem;
+        }
+      }
+
+      .part > .eyebrow {
+        color: var(--accent);
+        padding-bottom: 0.9rem;
+        border-bottom: 1px solid var(--rule);
+        margin-bottom: 1rem;
+      }
+
+      .part ol {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .part a {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        gap: 0.7rem;
+        align-items: baseline;
+      }
+
+      .part a:hover .title {
+        color: var(--accent);
+      }
+
+      .part .num {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--ink-3);
+        flex: none;
+      }
+
+      .part .title {
+        font-weight: 600;
+        font-size: 1rem;
+        line-height: 1.35;
+      }
+
+      .part .sub {
+        font-size: 0.92rem;
+        color: var(--ink-2);
+        line-height: 1.5;
+        display: block;
+        padding-top: 0.15rem;
+      }
+
+      /* ================================================================== *
+       * Running navigation
+       * ================================================================== */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background-color: var(--paper);
+        border-bottom: 1px solid var(--rule);
+        margin-bottom: 2rem;
+      }
+
+      .nav summary {
+        cursor: pointer;
+        padding-block: 0.95rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .nav summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .nav summary::after {
+        content: "Inhalt ↓";
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--ink-3);
+      }
+
+      .nav[open] summary::after {
+        content: "Schließen ↑";
+      }
+
+      .nav .current-label {
+        color: var(--ink-2);
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .nav ol {
+        list-style: none;
+        margin: 0;
+        padding: 0 0 1.5rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .nav-title {
+        display: none;
+      }
+
+      .nav .nav-part {
+        font-family: var(--sans);
+        font-size: 0.7rem;
+        font-weight: 650;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        padding: 1.3rem 0 0.5rem 1.85rem;
+      }
+
+      .nav ol > li:first-child .nav-part {
+        padding-top: 0;
+      }
+
+      .nav a {
+        display: block;
+        text-decoration: none;
+        color: var(--ink-2);
+        border-left: 2px solid var(--rule-soft);
+        padding: 0.3rem 0 0.3rem 1.75rem;
+        font-size: 0.94rem;
+        line-height: 1.4;
+        position: relative;
+      }
+
+      .nav a .n {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--ink-3);
+        position: absolute;
+        left: 0.5rem;
+        top: 0.45rem;
+      }
+
+      .nav a:hover {
+        color: var(--ink);
+      }
+
+      .nav li.is-active > a {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        font-weight: 620;
+      }
+
+      .nav li.is-active > a .n {
+        color: var(--accent);
+      }
+
+      .nav .subs {
+        display: none;
+        list-style: none;
+        margin: 0;
+        padding: 0.15rem 0 0.4rem;
+        flex-direction: column;
+      }
+
+      .nav li.is-active .subs {
+        display: flex;
+      }
+
+      .nav .subs a {
+        font-size: 0.87rem;
+        padding: 0.18rem 0 0.18rem 2.6rem;
+        color: var(--ink-3);
+        border-left-color: var(--accent);
+      }
+
+      .nav .subs a:hover,
+      .nav .subs li.is-active a {
+        color: var(--ink);
+      }
+
+      .nav-foot {
+        font-size: 0.8rem;
+        color: var(--ink-3);
+        padding: 1.25rem 0 0 1.85rem;
+        border-top: 1px solid var(--rule-soft);
+        margin-top: 1.25rem;
+      }
+
+      .nav-foot a {
+        color: var(--ink-3);
+        text-decoration: none;
+      }
+
+      .nav-foot a:hover {
+        color: var(--accent);
+      }
+
+      @media (width >= 64rem) {
+        .nav {
+          position: sticky;
+          top: 2.5rem;
+          max-height: calc(100vh - 5rem);
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          background: none;
+          border-bottom: 0;
+          margin-bottom: 0;
+        }
+        .nav summary {
+          display: none;
+        }
+        .nav ol {
+          padding-bottom: 0;
+        }
+        .nav-title {
+          display: block;
+          font-size: 0.72rem;
+          font-weight: 650;
+          letter-spacing: 0.13em;
+          text-transform: uppercase;
+          color: var(--ink-3);
+          padding: 0 0 1rem 1.85rem;
+          margin: 0;
+        }
+      }
+
+      /* ================================================================== *
+       * Sections
+       * ================================================================== */
+      .part-head {
+        max-width: var(--measure);
+        padding-top: 1.5rem;
+      }
+
+      .part-head p {
+        font-size: 0.95rem;
+        color: var(--ink-2);
+        padding-top: 0.6rem;
+      }
+
+      .part-head hr {
+        border: 0;
+        border-top: 2px solid var(--ink);
+        margin: 0 0 0.9rem;
+        width: 3rem;
+      }
+
+      .part-head .eyebrow {
+        color: var(--accent);
+      }
+
+      .part-head h2 {
+        font-size: clamp(1.7rem, 1.4rem + 1.4vw, 2.3rem);
+      }
+
+      section[id] {
+        padding-block: 3rem 1.5rem;
+        scroll-margin-top: 5.5rem;
+      }
+
+      .sec-head {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        margin-bottom: 1.75rem;
+        max-width: var(--measure);
+      }
+
+      .sec-head h3 {
+        font-size: clamp(1.5rem, 1.3rem + 1vw, 1.95rem);
+      }
+
+      .takeaway {
+        font-family: var(--serif);
+        font-size: 1.16em;
+        line-height: 1.45;
+        color: var(--ink);
+        border-left: 2px solid var(--accent);
+        padding-left: 1.1rem;
+        margin-top: 0.35rem;
+      }
+
+      h4 {
+        font-size: 1.22rem;
+        margin-top: 1rem;
+      }
+
+      h5 {
+        font-family: var(--sans);
+        font-size: 0.95rem;
+        font-weight: 650;
+        margin: 0;
+      }
+
+      ul,
+      ol {
+        padding-left: 1.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      li::marker {
+        color: var(--ink-3);
+      }
+
+      /* ================================================================== *
+       * Code
+       * ================================================================== */
+      figure.code {
+        background-color: var(--code-bg);
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        overflow: clip;
+      }
+
+      figure.code figcaption {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.01em;
+        color: var(--ink-3);
+        padding: 0.6rem 0.95rem;
+        border-bottom: 1px solid var(--rule);
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      figure.code pre {
+        margin: 0;
+        padding: 1rem 0.95rem;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 0.83rem;
+        line-height: 1.65;
+        tab-size: 2;
+      }
+
+      figure.code pre code {
+        background: none;
+        padding: 0;
+        font-size: inherit;
+      }
+
+      .copy {
+        font-family: var(--sans);
+        font-size: 0.72rem;
+        font-weight: 650;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        flex: none;
+      }
+
+      .copy:hover {
+        color: var(--accent);
+      }
+
+      /* ================================================================== *
+       * Callouts, tables, cards
+       * ================================================================== */
+      .note {
+        border-left: 3px solid var(--accent);
+        background-color: var(--accent-soft);
+        padding: 1rem 1.2rem;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        font-size: 0.97em;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .note .eyebrow {
+        color: var(--accent);
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.94rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.7rem 0.9rem 0.7rem 0;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      th {
+        font-size: 0.72rem;
+        font-weight: 650;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      td code {
+        white-space: nowrap;
+      }
+
+      .pair {
+        display: grid;
+        gap: 1rem;
+      }
+
+      @media (width >= 44rem) {
+        .pair {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .card {
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        padding: 1.1rem 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        background-color: var(--paper-2);
+        font-size: 0.97em;
+      }
+
+      .card.good {
+        border-color: color-mix(in oklab, var(--good) 40%, var(--rule));
+        background-color: var(--good-soft);
+      }
+
+      .card.bad {
+        border-color: color-mix(in oklab, var(--bad) 35%, var(--rule));
+        background-color: var(--bad-soft);
+      }
+
+      .card .tag {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .card.good .tag {
+        color: var(--good);
+      }
+
+      .card.bad .tag {
+        color: var(--bad);
+      }
+
+      .card pre {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        line-height: 1.6;
+        overflow-x: auto;
+      }
+
+      .card ul {
+        font-size: 0.95em;
+      }
+
+      /* ================================================================== *
+       * Layer diagram
+       * ================================================================== */
+      .layers {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 0.35rem;
+      }
+
+      .layers div {
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        padding: 0.8rem 1rem;
+        background-color: var(--paper-2);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.15rem 0.9rem;
+        align-items: baseline;
+      }
+
+      .layers b {
+        font-family: var(--mono);
+        font-size: 0.88rem;
+        min-width: 7rem;
+      }
+
+      .layers span {
+        font-size: 0.92rem;
+        color: var(--ink-2);
+      }
+
+      .layers div:last-child {
+        border-color: color-mix(in oklab, var(--accent) 45%, var(--rule));
+        background-color: var(--accent-soft);
+      }
+
+      .layers-axis {
+        font-size: 0.82rem;
+        color: var(--ink-3);
+        display: flex;
+        justify-content: space-between;
+        padding-top: 0.5rem;
+      }
+
+      /* ================================================================== *
+       * Schichten-Kette
+       * ================================================================== */
+      .chain {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: chain;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .chain li {
+        counter-increment: chain;
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        background-color: var(--paper-2);
+        padding: 0.85rem 1.1rem 0.85rem 3.2rem;
+        position: relative;
+      }
+
+      .chain li::before {
+        content: counter(chain);
+        position: absolute;
+        left: 1.1rem;
+        top: 0.85rem;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+      }
+
+      .chain b {
+        font-family: var(--sans);
+        font-size: 0.78rem;
+        font-weight: 650;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        display: block;
+        padding-bottom: 0.2rem;
+      }
+
+      .chain span {
+        font-size: 0.95rem;
+        color: var(--ink-2);
+        line-height: 1.55;
+      }
+
+      .downloads {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+      }
+
+      a.download {
+        font-size: 0.95rem;
+        font-weight: 620;
+        text-decoration: none;
+        color: var(--paper);
+        background-color: var(--accent);
+        border-radius: 2rem;
+        padding: 0.6rem 1.4rem;
+      }
+
+      a.download:hover {
+        background-color: var(--ink);
+      }
+
+      kbd {
+        font-family: var(--sans);
+        font-size: 0.8em;
+        font-weight: 600;
+        border: 1px solid var(--rule);
+        border-bottom-width: 2px;
+        border-radius: 0.3em;
+        padding: 0.1em 0.4em;
+        background-color: var(--paper-2);
+      }
+
+      /* ================================================================== *
+       * Decision helper
+       * ================================================================== */
+      .helper {
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        background-color: var(--paper-2);
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+      }
+
+      .helper .step {
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        color: var(--ink-3);
+      }
+
+      .helper .q {
+        font-family: var(--serif);
+        font-size: 1.45rem;
+        line-height: 1.25;
+      }
+
+      .helper .answers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+      }
+
+      .helper button {
+        font: inherit;
+        font-size: 0.95rem;
+        font-weight: 620;
+        padding: 0.5rem 1.35rem;
+        border-radius: 2rem;
+        border: 1px solid var(--ink);
+        background-color: var(--paper);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .helper button:hover {
+        background-color: var(--ink);
+        color: var(--paper);
+      }
+
+      .helper button.ghost {
+        border-color: var(--rule);
+        color: var(--ink-3);
+        font-weight: 500;
+      }
+
+      .helper button.ghost:hover {
+        background-color: transparent;
+        color: var(--ink);
+      }
+
+      .helper .verdict {
+        border-top: 1px solid var(--rule);
+        padding-top: 1.1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+      }
+
+      .helper .verdict h5 {
+        font-family: var(--serif);
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .helper .verdict p {
+        font-size: 0.97rem;
+      }
+
+      /* ================================================================== *
+       * Checklists
+       * ================================================================== */
+      .checklist {
+        list-style: none;
+        padding: 0;
+        gap: 0;
+      }
+
+      .checklist li {
+        border-bottom: 1px solid var(--rule-soft);
+      }
+
+      .checklist label {
+        display: flex;
+        gap: 0.8rem;
+        align-items: start;
+        padding: 0.7rem 0;
+        font-size: 0.97em;
+        cursor: pointer;
+      }
+
+      .checklist input {
+        margin-top: 0.42rem;
+        accent-color: var(--accent);
+        flex: none;
+      }
+
+      .checklist input:checked + span {
+        color: var(--ink-3);
+        text-decoration: line-through;
+      }
+
+      .checklist-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.85rem;
+        color: var(--ink-3);
+        padding-top: 0.9rem;
+      }
+
+      .checklist-foot button {
+        font: inherit;
+        background: none;
+        border: 0;
+        color: var(--ink-3);
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .checklist-foot button:hover {
+        color: var(--accent);
+      }
+
+      /* ================================================================== *
+       * Drawers, footer
+       * ================================================================== */
+      details.drawer {
+        border: 1px solid var(--rule);
+        border-radius: var(--radius);
+        padding: 0.9rem 1.2rem;
+        background-color: var(--paper-2);
+      }
+
+      details.drawer summary {
+        cursor: pointer;
+        font-weight: 620;
+        font-size: 0.97em;
+      }
+
+      details.drawer[open] summary {
+        margin-bottom: 0.9rem;
+      }
+
+      details.drawer > * + * {
+        margin-top: 0.8rem;
+      }
+
+      footer.site {
+        grid-column: 1 / -1;
+        border-top: 1px solid var(--rule);
+        padding-block: 2rem 3.5rem;
+        font-size: 0.87rem;
+        color: var(--ink-3);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.6rem;
+      }
+
+      .top-link {
+        font-size: 0.87rem;
+        color: var(--ink-3);
+        text-decoration: none;
+      }
+
+      .top-link:hover {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+
+  <body id="top">
+    <div class="shell">
+      <!-- ============================================================== -->
+      <header class="masthead">
+        <p class="eyebrow">Handbuch für Entwickler</p>
+        <h1>Das Lumos-System in Statamic</h1>
+        <p class="lede">
+          Ein CSS-System aus Tokens, Themes und Komponenten, das in Statamic als
+          Antlers-Partials liegt. Diese Seite erklärt, wie es funktioniert, wie
+          du damit eine Seite baust und wo du eingreifst, wenn etwas fehlt.
+        </p>
+        <p class="meta">
+          <span>Statamic 6 · Antlers</span>
+          <span>Plain CSS, Custom Properties, Cascade Layers</span>
+          <span>Kein Tailwind, kein CSS-Framework darunter</span>
+        </p>
+      </header>
+
+      <!-- ============================================================== -->
+      <div class="overview">
+        <h2>Übersicht</h2>
+        <div class="parts">
+          <div class="part">
+            <p class="eyebrow">Teil I · Grundlagen</p>
+            <ol>
+              <li>
+                <a href="#ueberblick"
+                  ><span class="num">01</span>
+                  <span
+                    ><span class="title">Überblick</span>
+                    <span class="sub"
+                      >Fünf Schichten, und wo sie im Projekt liegen.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#tokens"
+                  ><span class="num">02</span>
+                  <span
+                    ><span class="title">Tokens und fluide Skalen</span>
+                    <span class="sub"
+                      >Jeder Wert einmal, mitwachsend zwischen 320 und
+                      1440 px.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#themes"
+                  ><span class="num">03</span>
+                  <span
+                    ><span class="title">Themes</span>
+                    <span class="sub"
+                      >Farben kommen aus Variablen, nicht aus einer Palette.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#kaskade"
+                  ><span class="num">04</span>
+                  <span
+                    ><span class="title">Die Kaskade</span>
+                    <span class="sub"
+                      >Vier Layer entscheiden, was gewinnt.</span
+                    ></span
+                  ></a
+                >
+              </li>
+            </ol>
+          </div>
+
+          <div class="part">
+            <p class="eyebrow">Teil II · Seiten bauen</p>
+            <ol>
+              <li>
+                <a href="#anatomie"
+                  ><span class="num">05</span>
+                  <span
+                    ><span class="title">Anatomie einer Seite</span>
+                    <span class="sub"
+                      >Section, Container, Wrapper, Inhalt.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#bausteine"
+                  ><span class="num">06</span>
+                  <span
+                    ><span class="title">Die Bausteine</span>
+                    <span class="sub"
+                      >Welche Partials es gibt und wofür.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#aufrufen"
+                  ><span class="num">07</span>
+                  <span
+                    ><span class="title">Partials aufrufen</span>
+                    <span class="sub"
+                      >Params, Slots — und die <code>l-</code>Snippets in
+                      VS&nbsp;Code.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#aendern"
+                  ><span class="num">08</span>
+                  <span
+                    ><span class="title">Etwas anders haben wollen</span>
+                    <span class="sub"
+                      >Param, Utility, Token oder neues CSS — interaktiv.</span
+                    ></span
+                  ></a
+                >
+              </li>
+            </ol>
+          </div>
+
+          <div class="part">
+            <p class="eyebrow">Teil III · Eigenes bauen</p>
+            <ol>
+              <li>
+                <a href="#naming"
+                  ><span class="num">09</span>
+                  <span
+                    ><span class="title">Namenskonvention</span>
+                    <span class="sub"
+                      ><code>_wrap</code>, Präfixe, Primitives, lokale
+                      Variablen.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#komponente"
+                  ><span class="num">10</span>
+                  <span
+                    ><span class="title">Eine eigene Komponente</span>
+                    <span class="sub"
+                      >Oft genügen eine Klasse und eine CSS-Datei.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#varianten"
+                  ><span class="num">11</span>
+                  <span
+                    ><span class="title">Varianten</span>
+                    <span class="sub"
+                      >Der zentrale Mechanismus, und seine Fallen.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#globales-css"
+                  ><span class="num">12</span>
+                  <span
+                    ><span class="title">Globales CSS</span>
+                    <span class="sub">Vier Orte, und was es nirgends gibt.</span></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#partial-schreiben"
+                  ><span class="num">13</span>
+                  <span
+                    ><span class="title">Ein Partial schreiben</span>
+                    <span class="sub"
+                      >Front Matter und neun Stolpersteine.</span
+                    ></span
+                  ></a
+                >
+              </li>
+            </ol>
+          </div>
+
+          <div class="part">
+            <p class="eyebrow">Teil IV · Projekt &amp; Alltag</p>
+            <ol>
+              <li>
+                <a href="#cms"
+                  ><span class="num">14</span>
+                  <span
+                    ><span class="title">Das CMS</span>
+                    <span class="sub"
+                      >Der Kunde bearbeitet Inhalte, nie Design.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#alltag"
+                  ><span class="num">15</span>
+                  <span
+                    ><span class="title">Alltag und Checklisten</span>
+                    <span class="sub"
+                      >Dev-Server, Registrierung, Prüfen vor dem Commit.</span
+                    ></span
+                  ></a
+                >
+              </li>
+              <li>
+                <a href="#skill"
+                  ><span class="num">16</span>
+                  <span
+                    ><span class="title">Den Skill mitnehmen</span>
+                    <span class="sub"
+                      >Setzt das System in einem neuen Projekt auf. Als ZIP zum
+                      Download.</span
+                    ></span
+                  ></a
+                >
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <details class="nav" id="nav" open>
+        <summary>
+          <span class="current-label" data-current-label>Übersicht</span>
+        </summary>
+        <nav aria-label="Auf dieser Seite">
+          <p class="nav-title">Auf dieser Seite</p>
+          <ol>
+            <li>
+              <p class="nav-part">Teil I · Grundlagen</p>
+              <a href="#ueberblick"><span class="n">01</span>Überblick</a>
+              <ul class="subs">
+                <li><a href="#ueberblick-schichten">Die fünf Schichten</a></li>
+                <li><a href="#ueberblick-dateien">Wo was liegt</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#tokens"><span class="n">02</span>Tokens, fluide Skalen</a>
+              <ul class="subs">
+                <li><a href="#tokens-fluid">Wie ein Token entsteht</a></li>
+                <li><a href="#tokens-scale">Die Skalen</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#themes"><span class="n">03</span>Themes</a>
+              <ul class="subs">
+                <li><a href="#themes-vertrag">Die Farbvariablen</a></li>
+                <li><a href="#themes-invert">Invertieren</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#kaskade"><span class="n">04</span>Die Kaskade</a>
+              <ul class="subs">
+                <li><a href="#kaskade-order">Reihenfolge deklarieren</a></li>
+                <li><a href="#kaskade-style">Kein &lt;style&gt; im Template</a></li>
+              </ul>
+            </li>
+            <li>
+              <p class="nav-part">Teil II · Seiten bauen</p>
+              <a href="#anatomie"><span class="n">05</span>Anatomie einer Seite</a>
+              <ul class="subs">
+                <li><a href="#anatomie-beispiel">Eine Seite von oben</a></li>
+                <li><a href="#anatomie-ebenen">Wer wofür zuständig ist</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#bausteine"><span class="n">06</span>Die Bausteine</a>
+            </li>
+            <li>
+              <a href="#aufrufen"><span class="n">07</span>Partials aufrufen</a>
+              <ul class="subs">
+                <li><a href="#aufrufen-params">Params übergeben</a></li>
+                <li><a href="#aufrufen-slots">Slots</a></li>
+                <li><a href="#aufrufen-snippets">VS-Code-Snippets</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#aendern"><span class="n">08</span>Etwas ändern</a>
+              <ul class="subs">
+                <li><a href="#aendern-helfer">Interaktiv</a></li>
+                <li><a href="#aendern-reihenfolge">Die vier Stufen</a></li>
+              </ul>
+            </li>
+            <li>
+              <p class="nav-part">Teil III · Eigenes bauen</p>
+              <a href="#naming"><span class="n">09</span>Namenskonvention</a>
+              <ul class="subs">
+                <li><a href="#naming-wrap">Wurzel und Kinder</a></li>
+                <li><a href="#naming-primitives">Primitives</a></li>
+                <li><a href="#naming-props">Lokale Variablen</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#komponente"><span class="n">10</span>Eigene Komponente</a>
+              <ul class="subs">
+                <li><a href="#komponente-formen">Drei Formen</a></li>
+                <li><a href="#komponente-ohne-partial">Ohne Partial</a></li>
+                <li><a href="#komponente-namen">Inhalt oder Section</a></li>
+                <li><a href="#komponente-beispiel">Ein Beispiel</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#varianten"><span class="n">11</span>Varianten</a>
+              <ul class="subs">
+                <li><a href="#varianten-teile">Die drei Teile</a></li>
+                <li><a href="#varianten-modifier">Variante oder Modifier</a></li>
+                <li><a href="#varianten-primitive">Variante eines Primitives</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#globales-css"><span class="n">12</span>Globales CSS</a>
+              <ul class="subs">
+                <li><a href="#globales-css-faelle">Die vier Fälle</a></li>
+                <li><a href="#globales-css-vendor">Fremd-CSS</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#partial-schreiben"
+                ><span class="n">13</span>Ein Partial schreiben</a
+              >
+              <ul class="subs">
+                <li><a href="#partial-frontmatter">Front Matter</a></li>
+                <li><a href="#partial-fallen">Die Stolpersteine</a></li>
+              </ul>
+            </li>
+            <li>
+              <p class="nav-part">Teil IV · Projekt &amp; Alltag</p>
+              <a href="#cms"><span class="n">14</span>Das CMS</a>
+              <ul class="subs">
+                <li><a href="#cms-modi">Zwei Modi</a></li>
+                <li><a href="#cms-felder">Felder für Kunden</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#alltag"><span class="n">15</span>Alltag, Checklisten</a>
+              <ul class="subs">
+                <li><a href="#alltag-dev">Dev-Server und Registrierung</a></li>
+                <li><a href="#cl-style">Checkliste: neues Styling</a></li>
+                <li><a href="#cl-component">Checkliste: neue Komponente</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#skill"><span class="n">16</span>Den Skill mitnehmen</a>
+              <ul class="subs">
+                <li><a href="#skill-dateien">Die Dateien einzeln</a></li>
+                <li><a href="#skill-original">Skills des Frameworks</a></li>
+              </ul>
+            </li>
+          </ol>
+          <p class="nav-foot"><a href="#top">↑ Nach oben</a></p>
+        </nav>
+      </details>
+
+      <!-- ============================================================== -->
+      <main>
+        <div class="part-head">
+          <hr />
+          <p class="eyebrow">Teil I</p>
+          <h2>Grundlagen</h2>
+          <p>
+            Woraus das System besteht, wie Werte und Farben organisiert sind und
+            welche Regel entscheidet, welches CSS gewinnt.
+          </p>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="ueberblick">
+          <div class="sec-head">
+            <p class="eyebrow">01</p>
+            <h3>Überblick</h3>
+            <p class="takeaway">
+              Fünf Schichten. Jede baut auf der darunter auf, und alles Sichtbare
+              kommt aus der ersten.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              Das System ist gewöhnliches CSS: Custom Properties für alle Werte,
+              Cascade Layers für die Reihenfolge, Klassen als Schnittstelle. Es
+              gibt keinen Build-Schritt, der Klassen generiert, und keine
+              Utility-Bibliothek darunter. Was du im DOM siehst, steht so auch im
+              Stylesheet.
+            </p>
+
+            <h4 id="ueberblick-schichten">Die fünf Schichten</h4>
+            <div class="wide">
+              <ol class="chain">
+                <li>
+                  <b>Tokens</b>
+                  <span
+                    >Jeder Wert genau einmal, als CSS-Variable:
+                    <code>--space-6</code>, <code>--h2</code>,
+                    <code>--site-gutter</code>. Fluide, also mitwachsend mit dem
+                    Viewport.</span
+                  >
+                </li>
+                <li>
+                  <b>Themes</b>
+                  <span
+                    >Farbsets hinter festen Namen wie <code>--background</code>
+                    und <code>--text</code>. Als Klasse gesetzt, erben sie nach
+                    innen.</span
+                  >
+                </li>
+                <li>
+                  <b>Primitives</b>
+                  <span
+                    >Die Grundformen: <code>.section</code>,
+                    <code>.container</code>, <code>.layout</code>,
+                    <code>.heading</code>, <code>.text</code>. Sie bringen
+                    Abstände, Breiten und Typografie mit.</span
+                  >
+                </li>
+                <li>
+                  <b>Komponenten</b>
+                  <span
+                    >Antlers-Partials, die Primitives zusammensetzen und Params
+                    anbieten — <code>section</code>, <code>heading</code>,
+                    <code>button</code>, <code>card</code>. Damit baust du
+                    Seiten.</span
+                  >
+                </li>
+                <li>
+                  <b>Utilities</b>
+                  <span
+                    >Eine Eigenschaft pro Klasse für den Einzelfall:
+                    <code>margin-top-6</code>, <code>max-width-small</code>,
+                    <code>alignment-center</code>.</span
+                  >
+                </li>
+              </ol>
+            </div>
+
+            <p>
+              Eine Seite ist ein Baum aus Partials. Du schreibst kein Markup für
+              Layout, sondern verschachtelst Bausteine und gibst ihnen Params:
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>So sieht der Alltag aus</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>{{ partial:components/section theme="dark" padding_top="large" }}
+    {{ partial:components/content-wrapper centered="true" }}
+        {{ partial:components/heading tag="h1" variant="display" }}{{ title }}{{ /partial:components/heading }}
+        {{ partial:components/paragraph variant="large" }}{{ intro }}{{ /partial:components/paragraph }}
+    {{ /partial:components/content-wrapper }}
+{{ /partial:components/section }}</code></pre>
+            </figure>
+
+            <div class="note">
+              <p class="eyebrow">Wichtig von Anfang an</p>
+              <p>
+                <strong>Die Partials sind ein Angebot, keine Pflicht.</strong> Die
+                Klassen sind die Schnittstelle des Systems, also funktioniert ein
+                selbst geschriebenes
+                <code>&lt;section class="section theme-dark"&gt;</code> genauso.
+                Ebenso braucht eine eigene Komponente nicht zwingend ein Partial —
+                häufig sind es nur eine Klasse und eine CSS-Datei. Mehr dazu in
+                <a href="#komponente">Abschnitt 10</a>.
+              </p>
+            </div>
+
+            <p>
+              Und das ist die Regel, aus der alles andere folgt:
+              <strong
+                >Farben, Größen und Abstände schreibst du nie direkt hin.</strong
+              >
+              Sie kommen aus Tokens, und meistens musst du sie nicht einmal
+              nennen, weil ein Param sie schon setzt.
+            </p>
+
+            <h4 id="ueberblick-dateien">Wo was liegt</h4>
+            <figure class="code">
+              <figcaption>
+                <span>resources/</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>css/
+  site.css              ← Einstiegspunkt: Layer-Reihenfolge, alle Imports, Fonts
+  lumos/
+    base.css            ← Tokens, Themes, Reset, Textstile
+    patterns.css        ← Primitives (.section, .container, .heading, …)
+    utilities.css       ← Utility-Klassen
+  components/
+    button.css          ← eine Datei pro Komponente
+js/
+  site.js               ← importiert jede Komponenten-JS
+  components/
+    nav.js
+svg/                    ← Icons, gerendert über das icon-Partial
+views/
+  layout.antlers.html   ← Grundgerüst: head, nav, main, footer
+  components/           ← die Partials
+  sets/                 ← Inhaltsblöcke für den Page Builder
+blueprints/, fieldsets/ ← Feldkonfiguration fürs CMS</code></pre>
+            </figure>
+
+            <p>
+              Eine Komponente besteht aus bis zu drei Dateien mit
+              <strong>demselben Namen</strong>: dem Partial, dem Stylesheet und
+              dem Script. Antlers kann Styles nicht im Template mitführen, also
+              ist der gleiche Dateiname die Klammer:
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>Zusammengehörig, gleich benannt</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>views/components/nav.antlers.html   ← Markup und Params
+css/components/nav.css             ← Styles, importiert in site.css
+js/components/nav.js               ← Verhalten, importiert in site.js</code></pre>
+            </figure>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="tokens">
+          <div class="sec-head">
+            <p class="eyebrow">02</p>
+            <h3>Tokens und fluide Skalen</h3>
+            <p class="takeaway">
+              Jeder Abstand und jede Schriftgröße wächst zwischen 320 und 1440 px
+              mit. Du änderst nur die Endwerte.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="tokens-fluid">Wie ein Token entsteht</h4>
+            <p>
+              Jeder Wert existiert dreifach: ein Minimum, ein Maximum und ein
+              <code>clamp()</code>, das dazwischen linear interpoliert. Die
+              Endwerte stehen als reine Zahlen in Pixeln da, gerechnet wird in
+              <code>rem</code>.
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>lumos/base.css, Abschnitt „Design tokens"</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>--viewport-min: 320;
+--viewport-max: 1440;
+
+--space-6: clamp(…);   /* rechnet aus min und max — nicht anfassen */
+--space-6-min: 24;     /* bei 320 px Viewport */
+--space-6-max: 48;     /* ab 1440 px Viewport */</code></pre>
+            </figure>
+
+            <p>
+              Willst du alle mittleren Abstände größer haben, änderst du
+              <code>--space-6-max</code>. Die <code>clamp()</code>-Zeile bleibt,
+              wie sie ist. Dasselbe Muster gilt für Schriftgrößen
+              (<code>--h2-min</code>, <code>--h2-max</code>), für die Seitenränder
+              und für die Spaltenabstände.
+            </p>
+            <p>
+              Der Vorteil: Es gibt keine Breakpoint-Treppe für Typografie und
+              Abstände. Media Queries brauchst du nur, wenn ein Layout
+              <em>umbricht</em>, nicht wenn etwas nur größer werden soll.
+            </p>
+
+            <h4 id="tokens-scale">Die Skalen</h4>
+            <div class="wide">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Token</th>
+                    <th>Wofür</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>--space-1</code> … <code>--space-8</code></td>
+                    <td>
+                      Die Abstandsskala, von winzig bis großzügig. Alles, was
+                      Abstand ist, kommt hier heraus.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>--section-space-small|medium|large</code>
+                    </td>
+                    <td>Die Luft über und unter einer Section.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--site-margin</code></td>
+                    <td>Der Rand links und rechts, außerhalb des Inhalts.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--site-gutter</code></td>
+                    <td>Der Abstand zwischen Spalten.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>--site-width</code>, <code>--max-width-main</code>
+                    </td>
+                    <td>Inhaltsbreite und ihre Obergrenze.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>--display</code>, <code>--h1</code> …
+                      <code>--h6</code>, <code>--text-large|main|small</code>
+                    </td>
+                    <td>
+                      Die Typo-Skala. Pro Stufe gehören Zeilenhöhe, Laufweite
+                      und Ober-/Unterabstand dazu.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>--radius-small</code>, <code>--radius-main</code></td>
+                    <td>Rundungen. In manchen Projekten überall 0.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Für den Einzelfall gibt es dieselben Werte als Utilities:
+              <code>padding-top-large</code>, <code>margin-top-6</code>,
+              <code>gap-4</code>, <code>max-width-small</code>. Und in eigenem
+              CSS gilt: keine <code>px</code>. Längen in <code>rem</code> oder als
+              Token, Textbreiten in <code>ch</code>, alles was der Schriftgröße
+              folgen soll in <code>em</code>.
+            </p>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="themes">
+          <div class="sec-head">
+            <p class="eyebrow">03</p>
+            <h3>Themes</h3>
+            <p class="takeaway">
+              Verwende in eigenem CSS immer die Farbvariablen des Themes und
+              niemals eine feste Farbe. Dann passt sich dein Baustein jeder
+              Umgebung an.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              Ein Theme ist eine Klasse, die einen Satz Farbvariablen neu belegt:
+              <code>theme-light</code>, <code>theme-dark</code>,
+              <code>theme-brand</code>. Du setzt sie auf das
+              <code>&lt;html&gt;</code>-Element für die ganze Seite oder auf eine
+              einzelne Section — alles darin erbt die neuen Werte.
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>Eine dunkle Section auf einer hellen Seite</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>{{ partial:components/section theme="dark" }}
+    …
+{{ /partial:components/section }}</code></pre>
+            </figure>
+
+            <h4 id="themes-vertrag">Die Farbvariablen</h4>
+            <p>
+              Jedes Theme belegt dieselben Variablennamen — nur eben mit anderen
+              Werten. Ein dunkles Theme setzt <code>--background</code> auf ein
+              dunkles Blau und <code>--text</code> auf Weiß, ein helles macht es
+              umgekehrt. Wenn du in deinem CSS diese Namen benutzt, bekommst du
+              automatisch die Farben, die an dieser Stelle gelten:
+            </p>
+
+            <div class="wide">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Bedeutung</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>--background</code>, <code>--background-2</code>,
+                      <code>--background-3</code>
+                    </td>
+                    <td>
+                      Flächen, von der Seitenfläche bis zur abgesetzten Karte.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>--text</code>, <code>--text-2</code></td>
+                    <td>Textfarbe und ihre leisere Variante.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--border</code></td>
+                    <td>Linien und Rahmen.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>--button-*</code>, <code>--button-2-*</code>,
+                      <code>--link-*</code>
+                    </td>
+                    <td>
+                      Aktionen, jeweils mit Hover-Zustand. Primär, sekundär,
+                      Textlink.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <figure class="code">
+              <figcaption>
+                <span>Eigenes CSS, das in jedem Theme funktioniert</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>.content-note_wrap {
+  background-color: var(--background-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}</code></pre>
+            </figure>
+
+            <h4 id="themes-invert">Invertieren</h4>
+            <p>
+              <code>theme-invert</code> dreht relativ zum Elternteil: innerhalb
+              einer hellen Umgebung wird es dunkel, innerhalb einer dunklen hell.
+              Praktisch für ein Element, das sich immer abheben soll, egal wo es
+              steht.
+            </p>
+
+            <div class="note">
+              <p class="eyebrow">Faustregel</p>
+              <p>
+                Steht in deinem CSS ein Farbwert wie <code>#1b1917</code> oder
+                eine Palettenfarbe wie <code>--dark-800</code>, ist etwas falsch.
+                Nimm stattdessen eine der Variablen aus der Tabelle. Sonst bleibt
+                dein Baustein dunkel, sobald ihn jemand in eine helle Section
+                stellt.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="kaskade">
+          <div class="sec-head">
+            <p class="eyebrow">04</p>
+            <h3>Die Kaskade</h3>
+            <p class="takeaway">
+              Der Layer entscheidet, was gewinnt — nicht die Spezifität.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              Alles CSS liegt in vier Cascade Layers. Eine Utility mit einer
+              Klasse schlägt eine Komponentenregel mit drei, weil sie im höheren
+              Layer liegt. Damit musst du nicht mehr mit Spezifität rechnen, solange die
+              Reihenfolge stimmt.
+            </p>
+
+            <div class="wide">
+              <div class="layers">
+                <div>
+                  <b>base</b
+                  ><span
+                    >Tokens, Themes, Reset, Textstile —
+                    <code>lumos/base.css</code></span
+                  >
+                </div>
+                <div>
+                  <b>patterns</b
+                  ><span
+                    >Primitives: <code>.section</code>, <code>.container</code>,
+                    <code>.heading</code>, <code>.text</code>,
+                    <code>.layout</code></span
+                  >
+                </div>
+                <div>
+                  <b>components</b
+                  ><span
+                    >Eine Datei pro Komponente —
+                    <code>css/components/*.css</code></span
+                  >
+                </div>
+                <div>
+                  <b>utilities</b
+                  ><span>Einzelne Eigenschaften, gewinnen immer</span>
+                </div>
+              </div>
+              <p class="layers-axis">
+                <span>↓ niedrigste Priorität</span>
+                <span>höchste Priorität ↑</span>
+              </p>
+            </div>
+
+            <h4 id="kaskade-order">Reihenfolge deklarieren</h4>
+            <p>
+              In <code>css/site.css</code>. Der Layer steht immer
+              <strong>im Import</strong>, nie als Wrapper in der Datei selbst —
+              so kann dieselbe Datei nicht in zwei Layern landen, und die
+              Reihenfolge steht an genau einer Stelle.
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>resources/css/site.css</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>/* Cascade order, lowest priority first */
+@layer base, patterns, components, utilities;
+
+@import "./lumos/base.css" layer(base);
+@import "./lumos/patterns.css" layer(patterns);
+@import "./lumos/utilities.css" layer(utilities);
+
+/* Eine Zeile pro Komponente */
+@import "./components/button.css" layer(components);
+@import "./components/nav.css" layer(components);</code></pre>
+            </figure>
+
+            <div class="note">
+              <p class="eyebrow">Der eine Stolperstein</p>
+              <p>
+                Dasselbe <code>@layer</code>-Statement steht
+                <strong>zusätzlich</strong> inline im
+                <code>&lt;head&gt;</code>, im <code>base-head</code>-Partial. Der
+                Minifier entfernt es aus dem gebauten CSS, und ohne die
+                Reihenfolge landet <code>components</code> nach
+                <code>utilities</code>: Utilities greifen dann nicht mehr. Im
+                Dev-Server fällt das nicht auf, im Build schon. Beide Stellen
+                müssen gleich lauten.
+              </p>
+            </div>
+
+            <h4 id="kaskade-style">Kein <code>&lt;style&gt;</code> im Template</h4>
+            <p>
+              Ungelayertes CSS schlägt <em>jeden</em> Layer. Ein
+              <code>&lt;style&gt;</code>-Block in einer Seite liegt außerhalb der
+              vier Layer und gewinnt damit gegen alles, auch gegen Utilities, die
+              er nicht kennt. Deshalb gehört CSS immer in eine Datei mit
+              <code>layer(components)</code> — das ist keine Stilfrage, sondern
+              der Grund, warum das System vorhersagbar bleibt.
+            </p>
+          </div>
+        </section>
+
+        <div class="part-head">
+          <hr />
+          <p class="eyebrow">Teil II</p>
+          <h2>Seiten bauen</h2>
+          <p>
+            Der Alltag: Bausteine verschachteln, Params setzen, und für kleine
+            Abweichungen die richtige Stufe wählen.
+          </p>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="anatomie">
+          <div class="sec-head">
+            <p class="eyebrow">05</p>
+            <h3>Anatomie einer Seite</h3>
+            <p class="takeaway">
+              Section für Farbe und Luft, Container für die Breite, Wrapper für
+              Spalten und Ausrichtung, darin der Inhalt.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="anatomie-beispiel">Eine Seite von oben</h4>
+            <p>
+              Das Grundgerüst steht in <code>views/layout.antlers.html</code>:
+              <code>head</code>, Navigation, <code>main</code>, Footer. Ein
+              Template füllt nur <code>main</code>, und zwar Section für Section.
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>views/home.antlers.html</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>{{# Hero #}}
+{{ partial:components/section theme="dark" padding_top="large" }}
+    {{ partial:components/content-wrapper centered="true" }}
+        {{ partial:components/eyebrow }}{{ hero_eyebrow }}{{ /partial:components/eyebrow }}
+        {{ partial:components/heading tag="h1" variant="display" max_width="18" }}{{ hero_heading }}{{ /partial:components/heading }}
+        {{ partial:components/paragraph variant="large" max_width="48" }}{{ hero_text }}{{ /partial:components/paragraph }}
+        {{ partial:components/button-wrapper }}
+            {{ partial:components/button element="link" href="/kontakt" }}Kontakt{{ /partial:components/button }}
+        {{ /partial:components/button-wrapper }}
+    {{ /partial:components/content-wrapper }}
+{{ /partial:components/section }}
+
+{{# Text und Bild nebeneinander #}}
+{{ partial:components/section }}
+    {{ partial:components/content-wrapper variant="columns" }}
+        {{ partial:components/heading tag="h2" }}{{ heading }}{{ /partial:components/heading }}
+        {{ partial:components/paragraph }}{{ text }}{{ /partial:components/paragraph }}
+        {{ slot:column2 }}
+            {{ partial:components/img :image="image" }}
+        {{ /slot:column2 }}
+    {{ /partial:components/content-wrapper }}
+{{ /partial:components/section }}</code></pre>
+            </figure>
+
+            <h4 id="anatomie-ebenen">Wer wofür zuständig ist</h4>
+            <div class="wide">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ebene</th>
+                    <th>Aufgabe</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>section</code></td>
+                    <td>
+                      Theme, Abstand nach oben und unten, volle Höhe. Bringt
+                      innen automatisch einen <code>container</code> mit.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>container</code></td>
+                    <td>
+                      Inhaltsbreite, Seitenrand, vertikaler Abstand zwischen den
+                      Blöcken darin. Kommt aus <code>section</code>, du rufst ihn
+                      nicht selbst.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>content-wrapper</code></td>
+                    <td>
+                      Spalten und Ausrichtung. Bindet Textausrichtung und
+                      Flex-Ausrichtung an eine Variable, sodass
+                      <code>centered</code> den ganzen Block gemeinsam bewegt.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>grid</code></td>
+                    <td>
+                      Gleichrangige Kacheln: Karten, Logos, Teamfotos. Spalten
+                      pro Breakpoint als Param.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>eyebrow</code>, <code>heading</code>,
+                      <code>paragraph</code>, <code>button-wrapper</code>
+                    </td>
+                    <td>Der Inhalt selbst.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Nimm <code>content-wrapper</code> statt eines eigenen
+              <code>div</code>, sobald du Inhalt gruppierst. Er trägt die
+              Ausrichtung nach innen weiter, und alles darin — auch
+              <code>button-wrapper</code> — liest sie aus derselben Variable.
+            </p>
+
+            <div class="note">
+              <p class="eyebrow">Die meisten Abschnitte brauchen nichts Neues</p>
+              <p>
+                Eine Section, ein Wrapper darin, und Eyebrow, Heading, Paragraph
+                und Buttons als Inhalt: Damit ist der Großteil jeder Website
+                gebaut. Eigenes CSS ist die Ausnahme, nicht der Anfang.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="bausteine">
+          <div class="sec-head">
+            <p class="eyebrow">06</p>
+            <h3>Die Bausteine</h3>
+            <p class="takeaway">
+              Was es gibt, steht in <code>views/components/</code>. Jedes Partial
+              dokumentiert seine Params im Front Matter.
+            </p>
+          </div>
+          <div class="prose">
+            <div class="wide">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Gruppe</th>
+                    <th>Partials</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Struktur</td>
+                    <td>
+                      <code>section</code>, <code>content-wrapper</code>,
+                      <code>grid</code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Typografie</td>
+                    <td>
+                      <code>heading</code>, <code>paragraph</code>,
+                      <code>eyebrow</code>, <code>rich-text</code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Aktionen</td>
+                    <td><code>button</code>, <code>button-wrapper</code></td>
+                  </tr>
+                  <tr>
+                    <td>Medien</td>
+                    <td>
+                      <code>img</code>, <code>icon</code>, <code>video</code>,
+                      <code>overlay</code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Inhalt</td>
+                    <td><code>card</code>, <code>formatted-date</code></td>
+                  </tr>
+                  <tr>
+                    <td>Interaktiv</td>
+                    <td>
+                      <code>accordion</code>, <code>tabs</code>,
+                      <code>slider</code>, <code>modal</code>,
+                      <code>dropdown</code>, <code>marquee</code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Formular</td>
+                    <td>
+                      <code>form</code>, <code>input</code>,
+                      <code>textarea</code>, <code>select</code>,
+                      <code>choice</code>, <code>fieldset</code>,
+                      <code>range</code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Global</td>
+                    <td>
+                      <code>nav</code>, <code>footer</code>,
+                      <code>skip-link</code>, <code>base-head</code> — stehen im
+                      Layout, nicht im Template
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Die verlässlichste Dokumentation ist das Partial selbst: Oben im
+              Front Matter steht jeder Param mit seinem Default und einem
+              Kommentar, der die möglichen Werte aufzählt. Ein Blick dorthin ist
+              schneller als jede Suche.
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>Anfang von views/components/heading.antlers.html</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>---
+# The heading level, for the page outline.
+tag: h2
+# Type style, chosen apart from `tag`, so a heading can change level
+# without changing size. Unset, it matches `tag`.
+#   display, h1–h6 — the heading sizes
+#   large, main, small — the body sizes
+#   inherit — take the style from its surroundings
+variant: null
+# Longest line, in characters, before the text wraps.
+max_width: null
+class: null
+---</code></pre>
+            </figure>
+
+            <p>
+              Zwei Partials lohnen einen genaueren Blick, weil sie mehr tun, als
+              man erwartet: <code>card</code> ist eine ganze Kachel aus Eyebrow,
+              Heading, Text, Button und Bild, und <code>form</code> liest ein
+              Statamic-Formular samt Blueprint aus und zeichnet alle Felder mit
+              den Feld-Partials.
+            </p>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="aufrufen">
+          <div class="sec-head">
+            <p class="eyebrow">07</p>
+            <h3>Partials aufrufen</h3>
+            <p class="takeaway">
+              Tippe <code>l-</code> in einer Antlers-Datei, und die Bausteine
+              kommen mit allen Optionen als Auswahlliste.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="aufrufen-params">Params übergeben</h4>
+            <p>
+              Params sind <code>snake_case</code>. Ein fester Wert steht in
+              Anführungszeichen, ein Feld oder Ausdruck bekommt einen Doppelpunkt
+              vor den Param-Namen:
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>Feste Werte, Felder, Ausdrücke</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>{{ partial:components/heading tag="h2" variant="h3" }}…{{ /partial:components/heading }}
+
+{{ partial:components/img :image="teaser_image" }}
+
+{{ partial:components/button :emphasis="first ? 'primary' : 'secondary'" }}…{{ /partial:components/button }}</code></pre>
+            </figure>
+
+            <ul>
+              <li>
+                <strong>Booleans sind Strings:</strong>
+                <code>centered="true"</code> oder
+                <code>:centered="feld"</code>. Ein <code>:centered="true"</code>
+                ohne Anführungszeichen um den Wert kommt hingegen als
+                <code>null</code> an und wirkt nicht.
+              </li>
+              <li>
+                <strong>Weglassen heißt Default.</strong> Setze nur, was vom
+                Default abweicht — dann liest man am Aufruf, was die Entscheidung
+                war.
+              </li>
+              <li>
+                <strong>Bedingtes Rendern</strong> über
+                <code>:when</code> / <code>:unless</code> am Partial-Tag, etwa
+                <code>:when="image"</code>.
+              </li>
+              <li>
+                <strong>Leere Werte sind unproblematisch:</strong> Ein Partial ohne
+                Inhalt gibt nichts aus, nicht einmal ein leeres Element.
+              </li>
+            </ul>
+
+            <h4 id="aufrufen-slots">Slots</h4>
+            <p>
+              Alles zwischen öffnendem und schließendem Tag landet im
+              Standard-Slot. Manche Partials haben weitere, benannte Slots — die
+              zweite Spalte eines <code>content-wrapper</code> zum Beispiel:
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>Zwei Spalten füllen</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>{{ partial:components/content-wrapper variant="columns" }}
+    {{ partial:components/heading tag="h2" }}{{ title }}{{ /partial:components/heading }}
+    {{ slot:column2 }}
+        {{ partial:components/img :image="image" }}
+    {{ /slot:column2 }}
+{{ /partial:components/content-wrapper }}</code></pre>
+            </figure>
+
+            <h4 id="aufrufen-snippets">VS-Code-Snippets</h4>
+            <p>
+              Niemand tippt diese Aufrufe von Hand. Das Projekt bringt
+              <code>.vscode/lumos.code-snippets</code> mit: In einer
+              <code>.antlers.html</code>-Datei <code>l-</code> tippen, und die
+              Liste der Bausteine erscheint. Jeder Platzhalter ist eine
+              Auswahlliste der erlaubten Werte, durch die du mit
+              <kbd>Tab</kbd> springst.
+            </p>
+
+            <div class="wide">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Snippet</th>
+                    <th>Was es einfügt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>l-block</code></td>
+                    <td>
+                      Ein ganzer Abschnitt: Section, Wrapper, Eyebrow, Heading,
+                      Paragraph. Der schnellste Start.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>l-section</code></td>
+                    <td>Section mit Theme und Abständen als Auswahl</td>
+                  </tr>
+                  <tr>
+                    <td><code>l-content-wrapper</code></td>
+                    <td>Wrapper mit allen acht Varianten zur Wahl</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>l-heading</code>, <code>l-paragraph</code>,
+                      <code>l-eyebrow</code>, <code>l-rich-text</code>
+                    </td>
+                    <td>Typografie, mit Tag und Textstil als Auswahl</td>
+                  </tr>
+                  <tr>
+                    <td><code>l-button</code>, <code>l-button-wrapper</code></td>
+                    <td>Button als Link, primär oder sekundär</td>
+                  </tr>
+                  <tr>
+                    <td><code>l-grid</code></td>
+                    <td>Grid mit Spaltenzahl pro Breakpoint</td>
+                  </tr>
+                  <tr>
+                    <td><code>l-img</code>, <code>l-icon</code></td>
+                    <td>Bild mit Variante und Ladeverhalten, Icon mit Größe</td>
+                  </tr>
+                  <tr>
+                    <td><code>l-loop</code></td>
+                    <td>
+                      Ein <code>collection</code>-Loop mit
+                      <code>scope</code> — richtig aufgesetzt, siehe unten
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Kommt eine eigene Komponente dazu, die du öfter brauchst, gehört
+              ein Snippet dafür in dieselbe Datei. Das ist die einfachste Form von
+              Dokumentation: Sie erscheint genau dort, wo man sie braucht.
+            </p>
+
+            <div class="note">
+              <p class="eyebrow">Loops immer mit <code>scope</code></p>
+              <p>
+                <code>{{ cards scope="card" }}{{ card:heading }}{{ /cards }}</code>.
+                Ohne <code>scope</code> fällt ein leeres Feld einer Zeile
+                unbemerkt auf das gleichnamige Feld der Seite zurück — und du
+                siehst auf Zeile drei den Text von ganz oben.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="aendern">
+          <div class="sec-head">
+            <p class="eyebrow">08</p>
+            <h3>Etwas anders haben wollen</h3>
+            <p class="takeaway">
+              Vier Stufen, in dieser Reihenfolge. Die meisten Aufgaben enden auf
+              der ersten.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="aendern-helfer">Interaktiv</h4>
+            <div class="helper wide" data-helper>
+              <p class="step" data-step>Frage 1 von 4</p>
+              <p class="q" data-question>…</p>
+              <div class="answers" data-answers>
+                <button type="button" data-answer="yes">Ja</button>
+                <button type="button" data-answer="no">Nein</button>
+              </div>
+              <div class="verdict" data-verdict hidden>
+                <h5 data-verdict-title></h5>
+                <p data-verdict-body></p>
+                <div class="answers">
+                  <button type="button" class="ghost" data-restart>
+                    Von vorn
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <h4 id="aendern-reihenfolge">Die vier Stufen</h4>
+            <ol>
+              <li>
+                <strong>Param.</strong> Fast alles ist schon vorgesehen. Ein
+                anderes Raster ist
+                <code>{{ partial:components/grid small="2" large="4" }}</code>,
+                eine andere Spaltenaufteilung eine andere
+                <code>variant</code> am Wrapper.
+              </li>
+              <li>
+                <strong>Utility.</strong> Eine oder zwei Eigenschaften für einen
+                Einzelfall, ins Markup geschrieben:
+                <code>class="margin-top-8"</code>. Sobald mehrere Utilities
+                zusammenhalten müssen, um einen Look zu ergeben, ist das eine
+                Variante und keine Utility-Kette.
+              </li>
+              <li>
+                <strong>Default oder Token.</strong> Schreibst du dieselbe Utility
+                auf jede Instanz, ist der Default falsch. Repariere ihn an der
+                Quelle: ein Token in <code>lumos/base.css</code>, der Default
+                eines Params, oder ein neuer Param mit dem häufigeren Wert als
+                Default.
+              </li>
+              <li>
+                <strong>Erst jetzt eigenes CSS</strong>, in einer eigenen Datei,
+                importiert in <code>site.css</code>. Wie das aussieht, steht in
+                Teil III.
+              </li>
+            </ol>
+
+            <p>
+              Der Grund für die Reihenfolge ist nicht Sparsamkeit, sondern
+              Wartung: Jede Zeile eigenes CSS ist eine Zeile, die beim nächsten
+              Redesign mit gepflegt werden muss. Ein Param ist eine Entscheidung,
+              die dokumentiert ist und überall gleich wirkt.
+            </p>
+          </div>
+        </section>
+
+        <div class="part-head">
+          <hr />
+          <p class="eyebrow">Teil III</p>
+          <h2>Eigenes bauen</h2>
+          <p>
+            Wenn kein Baustein passt: wie eine eigene Komponente heißt, wo ihr
+            CSS liegt und wie ein Partial geschrieben wird.
+          </p>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="naming">
+          <div class="sec-head">
+            <p class="eyebrow">09</p>
+            <h3>Namenskonvention</h3>
+            <p class="takeaway">
+              Der Familienname ist der Dateiname. Ein Unterstrich pro Klasse.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="naming-wrap">Wurzel und Kinder</h4>
+            <p>
+              Eine Komponente <code>content-stats</code> hat die Wurzelklasse
+              <code>.content-stats_wrap</code>, und jedes Kind trägt den
+              Familiennamen als Präfix. Familienname in kebab-case, ein
+              Unterstrich pro Klasse.
+            </p>
+
+            <div class="pair wide">
+              <div class="card good">
+                <p class="tag">So</p>
+                <pre>.content-stats_wrap
+.content-stats_layout
+.content-stats_item
+.content-stats_value</pre>
+              </div>
+              <div class="card bad">
+                <p class="tag">Nicht so</p>
+                <pre>.stats
+.stats-grid
+.statsItem
+.value</pre>
+              </div>
+            </div>
+
+            <p>
+              Das <code>_wrap</code> ist kein Schmuck. Eine Variante ist eine
+              einfache Klasse ohne Präfix, die neben der Wurzel steht (dazu gleich
+              mehr) — Wurzel und Variante teilen sich also einen Namensraum. Ohne <code>_wrap</code> würde
+              eine Variante, die wie eine Komponente heißt —
+              <code>button</code>, <code>card</code> — unbemerkt deren Styles
+              erben.
+            </p>
+            <p>
+              Kinder heißen nach ihrer <strong>Rolle</strong>, nie nach der
+              Mechanik: <code>_layout</code> oder <code>_list</code>, nicht
+              <code>_grid</code> oder <code>_flex</code>. Die Eigenschaft
+              dahinter wechselt, die Rolle bleibt.
+            </p>
+
+            <h4 id="naming-primitives">Primitives</h4>
+            <p>
+              Was keine Kinder hat, heißt nur wie es ist:
+              <code>.heading</code>, <code>.text</code>, <code>.section</code>,
+              <code>.container</code>, <code>.layout</code>. Das sind die
+              Klassen aus <code>patterns.css</code>, und dort kommt kein
+              Unterstrich vor.
+            </p>
+            <p>
+              Wo eine solche Klasse passt, schreib sie neben deine eigene —
+              <code>text-style-h3</code>, <code>theme-invert</code> — und lass
+              die eigene Klasse nur die Abweichung halten. Ändert sich später der
+              Textstil, wandert die Änderung von allein mit.
+            </p>
+
+            <h4 id="naming-props">Lokale Variablen</h4>
+            <p>
+              Globale Tokens haben sprechende Namen:
+              <code>--space-6</code>, <code>--site-gutter</code>. Alles, was nur
+              einer Komponente gehört, beginnt mit <code>--_</code>:
+              <code>--_icon-width</code>, <code>--_alignment</code>. Der
+              Unterstrich sagt „privat".
+            </p>
+
+            <div class="note">
+              <p class="eyebrow">Vor dem Benennen</p>
+              <p>
+                Ein Variantenname gilt im ganzen Projekt. Eine kurze Suche zeigt,
+                ob er schon vergeben ist:
+                <code>grep -rn "\.narrow\b" resources/css</code>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="komponente">
+          <div class="sec-head">
+            <p class="eyebrow">10</p>
+            <h3>Eine eigene Komponente</h3>
+            <p class="takeaway">
+              Eine Komponente braucht kein Partial. Oft sind es nur eine Klasse
+              und eine CSS-Datei.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="komponente-formen">Drei Formen</h4>
+            <p>
+              „Komponente" heißt hier nicht automatisch „Partial". Es gibt sie in
+              drei Formen, und alle drei sind vollwertig:
+            </p>
+            <div class="wide">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Form</th>
+                    <th>Wann</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Nur CSS-Datei</strong></td>
+                    <td>
+                      Einmal verwendet, Markup ohne Bedingungen. Du schreibst das
+                      Markup direkt in die Seite und gibst ihm deine Klasse. Der
+                      häufigste Fall.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Partial + CSS-Datei</td>
+                    <td>
+                      Ab der zweiten Verwendung, oder wenn es Params, Slots oder
+                      Bedingungen braucht.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Nur Partial</td>
+                    <td>
+                      Reine Komposition aus bestehenden Bausteinen, ohne eine
+                      einzige neue CSS-Regel.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Die Regel lautet also nicht „eigenes CSS heißt eigenes Partial",
+              sondern:
+            </p>
+            <ul>
+              <li>
+                <strong>Eigene CSS-Datei,</strong> sobald eine Regel entsteht, die
+                kein Baustein abdeckt. Ohne Ausnahme, weil CSS im Template jeden
+                Layer schlägt.
+              </li>
+              <li>
+                <strong>Eigenes Partial,</strong> sobald sich Markup wiederholt
+                oder Bedingungen enthält.
+              </li>
+            </ul>
+
+            <h4 id="komponente-ohne-partial">Ohne Partial: Klasse plus Datei</h4>
+            <p>
+              Ein Beispiel für die erste Form. Das Markup steht in der Seite, die
+              Regeln in einer Datei — kein Partial, keine Params:
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>views/ueber-uns.antlers.html</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>{{ partial:components/section }}
+    &lt;div class="content-stats_wrap"&gt;
+        {{ stats scope="stat" }}
+            &lt;div class="content-stats_item"&gt;
+                &lt;p class="content-stats_value text-style-h2"&gt;{{ stat:value }}&lt;/p&gt;
+                &lt;p class="text text-style-small"&gt;{{ stat:label }}&lt;/p&gt;
+            &lt;/div&gt;
+        {{ /stats }}
+    &lt;/div&gt;
+{{ /partial:components/section }}</code></pre>
+            </figure>
+
+            <p>
+              Beachte, dass auch hier Bausteine mitgenutzt werden: Die Klassen
+              <code>text</code> und <code>text-style-h2</code> bringen Typografie
+              und Abstände mit, deine eigenen Klassen halten nur das Layout und
+              die Akzentfarbe.
+            </p>
+            <p>
+              Wird derselbe Block später auf einer zweiten Seite gebraucht,
+              wandert nur das Markup in ein Partial. Die CSS-Datei bleibt liegen,
+              wie sie ist — sie heißt schon richtig, weil sie nach der
+              Klassenfamilie benannt ist und nicht nach der Seite.
+            </p>
+
+            <h4 id="komponente-namen">Inhalt oder Section</h4>
+            <ul>
+              <li>
+                <code>content-blog-hero</code>, <code>content-cta-main</code> —
+                umfasst den <strong>Inhalt</strong>, nicht die Section. Der
+                Standardfall, denn so bleiben Theme und Abstände pro Seite frei
+                wählbar.
+              </li>
+              <li>
+                <code>section-hero-main</code> — umfasst die
+                <strong>ganze Section</strong>, aber nur wenn die Styles auf ihr
+                selbst sitzen: ein gepinnter Full-Height-Scroll, ein
+                Hintergrundbild.
+              </li>
+            </ul>
+            <p>
+              Erst der Typ, dann die Variante, damit eine Suche nach
+              <code>content-</code> alle findet und <code>content-cta</code> eine
+              Familie eingrenzt.
+            </p>
+            <p>
+              Im Inneren stehen wieder Bausteine: das
+              <code>heading</code>-Partial statt eines <code>h2</code> mit
+              Klasse, <code>button</code> statt eines gestylten
+              <code>a</code>. Und eine Inhaltskomponente gibt
+              <strong>Inhalt</strong> nach oben weiter, nicht Styling — reicht sie
+              ein <code>tag</code> durch, setzt sie <code>variant</code> selbst,
+              sonst wandert die Textgröße mit der Überschriftenebene.
+            </p>
+
+            <h4 id="komponente-beispiel">Ein Beispiel</h4>
+            <p>
+              Ein Zahlenblock, den kein Baustein abdeckt. Zwei neue Dateien und
+              eine Zeile:
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>css/components/content-stats.css</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>.content-stats_wrap {
+  display: grid;
+  gap: var(--space-6) var(--site-gutter);
+  @media (width &gt;= 48rem) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.content-stats_value {
+  color: var(--heading-accent);
+}</code></pre>
+            </figure>
+
+            <figure class="code">
+              <figcaption>
+                <span>css/site.css — eine Zeile dazu</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>@import "./components/content-stats.css" layer(components);</code></pre>
+            </figure>
+
+            <p>
+              Die Breakpoints kommen aus <code>grid.css</code> —
+              <code>30rem</code>, <code>48rem</code>, <code>64rem</code> — und
+              werden dort nachgelesen, nicht aus dem Kopf geschrieben. Verlass
+              dich nicht auf die Media Queries eines verschachtelten Bausteins:
+              Lass dessen Spalten-Params leer und mach dein Layout von deiner
+              eigenen Klasse aus responsiv.
+            </p>
+
+            <p>
+              Der Test, ob die Komponente fertig ist: In eine andere Seite
+              kopiert muss sie funktionieren, ohne dass etwas anderes mitwandert.
+            </p>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="varianten">
+          <div class="sec-head">
+            <p class="eyebrow">11</p>
+            <h3>Varianten</h3>
+            <p class="takeaway">
+              Eine benannte Voreinstellung derselben Komponente: ein zusätzliches
+              Wort in der Klassenliste.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              Gleiches Markup, gleiche Slots, anderes Aussehen.
+              <code>content-wrapper</code> hat acht Varianten —
+              <code>stack</code>, <code>columns</code>, <code>breakout</code>,
+              <code>contain</code>, <code>sticky-content</code>,
+              <code>sticky-visual</code>, <code>auto-width</code>,
+              <code>card</code> — und alle geben dasselbe
+              <code>div.layout</code> aus, nur mit einer Klasse mehr.
+            </p>
+
+            <h4 id="varianten-teile">Die drei Teile</h4>
+            <figure class="code">
+              <figcaption>
+                <span>1 · Param im Front Matter, Optionen dokumentiert</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code># How the two columns are arranged.
+#   stack — one column, everything in order (default)
+#   columns — two even columns from 64rem up
+variant: stack</code></pre>
+            </figure>
+
+            <figure class="code">
+              <figcaption>
+                <span>2 · Param wird Klasse — der Default gibt keine aus</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>&lt;div class="layout{{ if view:variant != 'stack' }} {{ view:variant }}{{ /if }}"&gt;</code></pre>
+            </figure>
+
+            <figure class="code">
+              <figcaption>
+                <span>3 · CSS, verschachtelt unter der Wurzel</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>.layout {
+  --_alignment: start;
+  --_column-count: 1;
+
+  &amp;.centered {
+    --_alignment: center;
+  }
+  &amp;.columns {
+    display: grid;
+    @media (width &gt;= 64rem) {
+      --_column-count: 2;
+    }
+  }
+}</code></pre>
+            </figure>
+
+            <p>
+              Der Trick steckt in <code>&amp;.centered</code>: eine Zeile, und
+              über <code>--_alignment</code> erreicht die Änderung alle Spalten,
+              jeden Text und jeden Button darin. Wenn du beim Schreiben einer
+              Variante Kind-Selektoren wiederholst, fehlt oben in der Wurzel eine
+              Variable.
+            </p>
+
+            <h4 id="varianten-modifier">Variante oder Modifier</h4>
+            <div class="pair wide">
+              <div class="card">
+                <p class="tag">Variante</p>
+                <p>
+                  Gegenseitig ausschließend: etwas ist
+                  <code>columns</code> <em>oder</em> <code>breakout</code>. Ein
+                  <code>variant</code>-Param, im CMS ein Select.
+                </p>
+              </div>
+              <div class="card">
+                <p class="tag">Modifier</p>
+                <p>
+                  Unabhängig schaltbar und für mehrere Varianten gültig:
+                  <code>reverse</code>, <code>centered</code>. Eigener
+                  Boolean-Param, und im Kommentar steht, für welche Varianten er
+                  gilt.
+                </p>
+              </div>
+            </div>
+
+            <details class="drawer wide">
+              <summary>
+                Die Falle: warum die Variante <code>card</code> nicht
+                <code>.card</code> heißt
+              </summary>
+              <p>
+                <code>content-wrapper</code> gibt für
+                <code>variant="card"</code> die Klassen
+                <code>card-layout theme-dark</code> aus. Eine Klasse
+                <code>.card</code> würde die Styles der Card-Komponente erben,
+                weil Wurzel und Variante sich den Namensraum teilen. Der Param
+                heißt trotzdem <code>card</code>, weil das der Begriff ist — nur
+                die Klasse weicht aus.
+              </p>
+            </details>
+
+            <h4 id="varianten-primitive">Variante eines Primitives</h4>
+            <p>
+              Der häufigste Fall: Du willst den <code>container</code> anders
+              haben. Der ist ein Primitive aus <code>patterns.css</code>, und
+              diese Datei wird nicht editiert. Der Reihenfolge nach:
+            </p>
+            <ol>
+              <li>
+                Einzelfall über den vorhandenen Param:
+                <code>container_class="max-width-small"</code>
+              </li>
+              <li>
+                Überall gleich? Dann Token oder Param-Default ändern, nicht jeden
+                Aufruf.
+              </li>
+              <li>
+                Wirklich eine Variante? Neuer Param am
+                <code>section</code>-Partial, CSS in einer eigenen
+                <code>section.css</code>.
+              </li>
+            </ol>
+
+            <div class="note">
+              <p class="eyebrow">Anti-Pattern</p>
+              <p>
+                <code>.grid.hero</code> in einer anderen Datei als
+                <code>grid.css</code>. Dann stylen zwei Dateien dasselbe Element
+                und keine ist vollständig. Außerdem ist <code>hero</code> ein
+                Ort, kein Name für eine Form — Varianten heißen wie
+                <code>autofit</code> und <code>autofill</code>. Gilt das Layout
+                nur an einer Stelle, schreib ein eigenes Grid ganz hin und lass
+                <code>.grid</code> aus dem Markup.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="globales-css">
+          <div class="sec-head">
+            <p class="eyebrow">12</p>
+            <h3>Globales CSS</h3>
+            <p class="takeaway">
+              CSS, das „irgendwie global" ist, ist meistens eine Komponente, die
+              noch fehlt.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="globales-css-faelle">Die vier Fälle</h4>
+            <div class="wide">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Was</th>
+                    <th>Wohin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Tokens, Themes, Textstile</td>
+                    <td>
+                      <code>lumos/base.css</code>, in den passenden der vier
+                      Abschnitte
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Schriften</td>
+                    <td><code>site.css</code>, bei den <code>@font-face</code></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Eigene globale Regeln (<code>::selection</code>, Print,
+                      Fokus-Ring)
+                    </td>
+                    <td><code>@layer base { … }</code> in <code>site.css</code></td>
+                  </tr>
+                  <tr>
+                    <td>Eigene Utility</td>
+                    <td>
+                      <code>@layer utilities { … }</code> in
+                      <code>site.css</code>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Fremd-CSS einer Library</td>
+                    <td>Eigener <code>vendor</code>-Layer, siehe unten</td>
+                  </tr>
+                  <tr>
+                    <td>Seitenspezifisches CSS</td>
+                    <td>Gibt es nicht — das ist eine Komponente</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <figure class="code">
+              <figcaption>
+                <span>Eigene globale Regeln</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>/* site.css, nach den Imports */
+@layer base {
+  ::selection {
+    background-color: var(--selection-background);
+    color: var(--selection-text);
+  }
+}</code></pre>
+            </figure>
+
+            <p>
+              Im gleichen Layer gewinnt das Spätere. Dein Block steht nach den
+              Imports und überschreibt den Reset also, ohne dass du
+              <code>base.css</code> anfassen musst. Wächst er über etwa 20
+              Zeilen, wird eine eigene Datei daraus, importiert mit
+              <code>layer(base)</code>.
+            </p>
+
+            <h4 id="globales-css-vendor">Fremd-CSS</h4>
+            <figure class="code">
+              <figcaption>
+                <span>Unter alles legen</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>@layer vendor, base, patterns, components, utilities;
+
+@import "glightbox/dist/css/glightbox.css" layer(vendor);</code></pre>
+            </figure>
+
+            <div class="note">
+              <p class="eyebrow">Nicht vergessen</p>
+              <p>
+                Der neue Layer muss in <strong>beide</strong>
+                Layer-Deklarationen: in <code>site.css</code> und in das
+                Inline-<code>&lt;style&gt;</code> im
+                <code>base-head</code>-Partial. Nur das Inline-Statement
+                überlebt den Build.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="partial-schreiben">
+          <div class="sec-head">
+            <p class="eyebrow">13</p>
+            <h3>Ein Partial schreiben</h3>
+            <p class="takeaway">
+              Params stehen im Front Matter und werden nur über
+              <code>view:</code> gelesen.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="partial-frontmatter">Front Matter</h4>
+            <p>
+              Jeder Param bekommt einen Default (<code>null</code>, wenn
+              ungesetzt) und einen <code>#</code>-Kommentar darüber, der die
+              möglichen Werte nennt. Das ist die Dokumentation, die andere später
+              lesen — und die Vorlage für ein Snippet.
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>Der Aufbau, am Beispiel von heading</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>---
+# The heading level, for the page outline.
+tag: h2
+# Type style, chosen apart from `tag`. Unset, it matches `tag`.
+variant: null
+class: null
+---
+{{ if slot | trim }}{{ _variant = view:variant ?? view:tag }}
+&lt;{{ view:tag }} class="heading text-style-{{ _variant }}{{ if view:class }} {{ view:class }}{{ /if }}"&gt;{{ slot | trim }}&lt;/{{ view:tag }}&gt;
+{{ /if }}</code></pre>
+            </figure>
+
+            <p>
+              Reihenfolge der Params: Inhalt, der pro Instanz wechselt, dann
+              <code>variant</code>, dann Params, die nur für eine Variante gelten
+              (im Kommentar sagen, welche), dann seltene Einstellungen, zuletzt
+              <code>class</code>.
+            </p>
+
+            <h4 id="partial-fallen">Die Stolpersteine</h4>
+            <p>
+              Alle neun sind Fehler, die keine Fehlermeldung erzeugen, sondern
+              unbemerkt falsch rendern:
+            </p>
+            <ul>
+              <li>
+                <strong>Params nur als <code>view:name</code> lesen.</strong> Ein
+                Partial erbt den ganzen Seiten-Kontext, ein einfaches
+                <code>{{ variant }}</code> greift also unbemerkt ein Feld gleichen
+                Namens aus dem Entry ab.
+              </li>
+              <li>
+                <strong>Booleans sind Strings.</strong> Mit
+                <code>| to_bool</code> lesen, sonst ist der String
+                <code>"false"</code> wahr.
+              </li>
+              <li>
+                <strong><code>src</code> ist reserviert</strong> — damit wählt
+                der Partial-Tag das Template. Deshalb heißt der Param bei
+                <code>icon</code> <code>name</code> und bei <code>img</code>
+                <code>image</code>.
+              </li>
+              <li>
+                <strong>Lokale Variablen mit <code>_</code></strong> und nie so
+                wie ein Feld: Sie leben im Seiten-Kontext weiter. Ein
+                <code>{{ items = … }}</code> hat schon den
+                <code>items</code>-Loop des nächsten Blocks zerlegt.
+              </li>
+              <li>
+                <strong>Keine Tag-Paare in Params.</strong> Erst in eine Variable
+                bauen, dann übergeben. In Ternaries Konkatenation klammern:
+                <code>x ? (' ' + y) : ''</code>.
+              </li>
+              <li>
+                <strong>Tags laufen nicht in Ausdrücken.</strong> Ein
+                <code>x = (glide …)</code> schlägt fehl; ruf den Tag im Markup
+                auf.
+              </li>
+              <li>
+                <strong>Nichts ausgeben,</strong> wenn ein nötiger Param fehlt
+                oder die Slots leer sind: <code>{{ if slot | trim }}</code>.
+                Sonst zählt ein leeres Element im Flex-Gap mit.
+              </li>
+              <li>
+                <strong>Assoziative Arrays</strong> (etwa die Optionen eines
+                Feldes) brauchen
+                <code>{{ foreach :array="options" }}</code> mit
+                <code>key</code> und <code>value</code>.
+              </li>
+              <li>
+                <strong>Icons</strong> brauchen
+                <code>{{ svg sanitize="false" }}</code>, sonst entfernt der
+                Sanitizer Attribute wie <code>vector-effect</code>.
+              </li>
+            </ul>
+
+            <details class="drawer wide">
+              <summary>Was fehlt, wenn du Markup selbst schreibst</summary>
+              <p>
+                Die Klassen sind die Schnittstelle, ein selbst geschriebenes
+                <code>&lt;section class="section theme-dark"&gt;</code> sieht also
+                genauso aus wie das Partial. Was fehlt, sind die Leer-Prüfungen, die sichtbaren
+                Defaults und die Details, die man beim Abschreiben übersieht: ein
+                <code>span</code> um den Button-Text, das
+                <code>aria-hidden</code> an einem dekorativen Marker, dass die
+                Standardvariante gar keine Klasse ausgibt.
+              </p>
+              <p>
+                Praktische Grenze: Alles mit Logik oder Struktur bleibt im
+                Partial. Roh geschrieben wird nur Markup ohne Bedingungen und
+                ohne Wiederholung — ein Wrapper-<code>div</code>, das es genau
+                einmal gibt.
+              </p>
+            </details>
+          </div>
+        </section>
+
+        <div class="part-head">
+          <hr />
+          <p class="eyebrow">Teil IV</p>
+          <h2>Projekt und Alltag</h2>
+          <p>
+            Was das CMS dem Kunden zeigt, wie der Dev-Server läuft und was vor
+            dem Commit geprüft wird.
+          </p>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="cms">
+          <div class="sec-head">
+            <p class="eyebrow">14</p>
+            <h3>Das CMS</h3>
+            <p class="takeaway">
+              Der Kunde bearbeitet Inhalte, nie Design. Einzige Ausnahme: der
+              Hintergrund, hell oder dunkel.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              Ein Feld, das verändert, <em>wie</em> etwas aussieht statt
+              <em>was</em> dort steht, kommt nicht ins Backend. Die Bausteine
+              haben Params für Theme, Abstände und Varianten — die bleiben im
+              Template. Im Backend wären sie drei
+              Design-Entscheidungen pro Abschnitt — und die will der Kunde gar
+              nicht treffen müssen.
+            </p>
+
+            <h4 id="cms-modi">Zwei Modi</h4>
+            <div class="pair wide">
+              <div class="card">
+                <p class="tag">A — nur Code</p>
+                <p>
+                  Jede Seite ist ein Template aus Partials, das CMS hält die
+                  Inhalte.
+                </p>
+                <ul>
+                  <li>
+                    Ein Blueprint pro Seitentyp, mit verstecktem
+                    <code>template</code>-Feld
+                  </li>
+                  <li>
+                    Wiederkehrende Inhalte als eigene Collection, nicht als
+                    Listenfeld
+                  </li>
+                  <li>Seitenweite Texte in Globals</li>
+                </ul>
+                <p>Für Sites, deren Seiten einzeln gestaltet sind.</p>
+              </div>
+              <div class="card">
+                <p class="tag">B — Content-Blöcke</p>
+                <p>
+                  Ein Replicator aus inhaltlich benannten Blöcken: Hero, Text
+                  &amp; Bild, Team, FAQ.
+                </p>
+                <ul>
+                  <li>Pro Block nur Inhaltsfelder plus <code>background</code></li>
+                  <li>Theme und Abstände setzt der Wrapper nach Blocktyp</li>
+                  <li>Zwei Layouts sind zwei Blöcke, kein Auswahlfeld</li>
+                </ul>
+                <p>Für Kunden, die selbst Seiten anlegen.</p>
+              </div>
+            </div>
+            <p>
+              Mischen ist der Normalfall: handgebaute Startseite, Unterseiten aus
+              Blöcken.
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>views/default.antlers.html — Modus B</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>{{ _padding_top = ['hero' =&gt; 'large'] }}
+{{ blocks }}
+    {{ partial:components/section :theme="background == 'dark' ? 'dark' : 'inherit'" :padding_top="_padding_top[type] ?? 'medium'" }}
+        {{ partial src="sets/{type}" }}
+    {{ /partial:components/section }}
+{{ /blocks }}</code></pre>
+            </figure>
+
+            <p>
+              Die Templates in <code>views/sets/</code> sind die Blöcke selbst:
+              Sie halten den Inhalt, nie die Section, und bauen alles aus
+              Partials. Sie sind der eine Ort, an dem Felder direkt gelesen
+              werden (<code>{{ heading }}</code>), weil der Loop den Kontext des
+              Blocks liefert.
+            </p>
+
+            <h4 id="cms-felder">Felder für Kunden</h4>
+            <ul>
+              <li>
+                <strong>Instructions</strong> an jedem Feld, in der Sprache des
+                Kunden.
+              </li>
+              <li>
+                <strong><code>character_limit</code></strong> auf Überschriften,
+                Eyebrows und Button-Labels, passend zu dem, was das Design
+                trägt.
+              </li>
+              <li>
+                <strong>Rich Text klein halten:</strong> fett, kursiv, Link,
+                Listen. Überschriften nur, wo das Design sie stylt. Keine
+                Ausrichtung, keine Farben, keine Tabellen.
+              </li>
+              <li>
+                <strong>Buttons:</strong> Label und Link, maximal zwei. Der Stil
+                folgt der Position — der erste primär, der zweite sekundär.
+              </li>
+              <li>
+                <strong>Bilder:</strong> ein Bild pro Feld, Alt-Text im
+                Asset-Blueprint verpflichtend, Zuschnitt über den Fokuspunkt.
+              </li>
+              <li>
+                <strong>Rollen:</strong> Blueprints und Fieldsets sperren geht
+                erst mit Statamic Pro. Solo hat einen einzigen Benutzer, und der
+                ist Super-Admin.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------------- -->
+        <section id="alltag">
+          <div class="sec-head">
+            <p class="eyebrow">15</p>
+            <h3>Alltag und Checklisten</h3>
+            <p class="takeaway">
+              Neue Datei heißt neue Zeile in <code>site.css</code> oder
+              <code>site.js</code>. Sonst passiert nichts.
+            </p>
+          </div>
+          <div class="prose">
+            <h4 id="alltag-dev">Dev-Server und Registrierung</h4>
+            <figure class="code">
+              <figcaption>
+                <span>Terminal</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>composer dev     # PHP, Queue und Vite zusammen
+npm run dev      # nur Vite
+npm run build    # Produktionsbuild — hier zeigen sich Layer-Fehler</code></pre>
+            </figure>
+
+            <ul>
+              <li>
+                Neues Stylesheet? Eine Zeile in <code>site.css</code> mit
+                <code>layer(components)</code>.
+              </li>
+              <li>
+                Neues Script? Ein Import in <code>site.js</code>. Es lädt auf
+                jeder Seite, also erst prüfen, ob das Element überhaupt da ist.
+              </li>
+              <li>
+                Neues Icon? SVG nach <code>resources/svg/</code>, gerendert über
+                das <code>icon</code>-Partial.
+              </li>
+              <li>
+                Nach einer Änderung an <code>vite.config.js</code> Vite neu
+                starten.
+              </li>
+              <li>
+                Jede Änderung im Browser ansehen, und zwar in jeder Breite, in
+                der sie umbricht: <code>30rem</code>, <code>48rem</code>,
+                <code>64rem</code>.
+              </li>
+            </ul>
+
+            <h4 id="cl-style">Checkliste: neues Styling</h4>
+            <ul class="checklist" data-checklist="style">
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Es gibt keinen Param und keine Variante, die es
+                    abdeckt.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Utilities nur für einen Einzelfall, nicht mehrere, die
+                    zusammen einen Look ergeben.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Nichts wiederholt sich auf jeder Instanz — sonst ist der
+                    Default falsch.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Liegt in der eigenen Datei der Komponente, importiert mit
+                    <code>layer(components)</code>, ohne
+                    <code>@layer</code>-Wrapper in der Datei. Kein CSS im
+                    Template.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Wurzelklasse endet auf <code>_wrap</code>, Kinder tragen
+                    den Familiennamen als Präfix.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Kinder heißen nach ihrer Rolle (<code>_layout</code>,
+                    <code>_list</code>), nicht nach der Mechanik.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Farben kommen aus den Theme-Variablen
+                    (<code>--background</code>, <code>--text</code>,
+                    <code>--border</code>), nicht aus einer Palette.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Abstände und Größen kommen aus Tokens. Keine
+                    <code>px</code>: <code>rem</code> für Längen,
+                    <code>ch</code> für Textbreiten, <code>em</code> für alles,
+                    was der Schriftgröße folgt.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Passende Pattern-Klasse steht daneben
+                    (<code>text-style-h3</code>,
+                    <code>theme-invert</code>).</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Auszeichnung in Überschriften wird vom Elternteil gestylt
+                    (<code>.heading-accent strong</code>), weil Rich Text keine
+                    Klassen tragen kann.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Media Queries in der Regel verschachtelt, die sie ändern.
+                    Eine Query pro Komponente, nicht pro Kind.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Breakpoints aus <code>grid.css</code> gelesen, und keine
+                    Abhängigkeit von den Media Queries eines verschachtelten
+                    Bausteins.</span
+                  ></label
+                >
+              </li>
+            </ul>
+            <p class="checklist-foot">
+              <span data-count="style"></span>
+              <button type="button" data-reset="style">Zurücksetzen</button>
+            </p>
+
+            <h4 id="cl-component">Checkliste: neue Komponente</h4>
+            <ul class="checklist" data-checklist="component">
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Sie verdient ihre Existenz. Eine neue Art Karte ist eine
+                    <code>card</code>-Variante, kein zweites Partial.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Gibt nichts aus, wenn ein nötiger Param fehlt oder die
+                    Slots leer sind.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Params sind sortiert und im Front Matter beschrieben, im
+                    Wortlaut der anderen Partials.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Ihr Inneres ist aus Bausteinen gebaut, nicht aus gestylten
+                    Elementen.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Umfasst den Inhalt (<code>content-…</code>), nicht die
+                    Section — außer die Styles sitzen auf der Section selbst
+                    (<code>section-…</code>).</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >In eine andere Seite kopiert funktioniert sie, ohne dass
+                    etwas anderes mitwandert.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >Ein Snippet in <code>.vscode/lumos.code-snippets</code>
+                    ergänzt, wenn sie öfter gebraucht wird.</span
+                  ></label
+                >
+              </li>
+              <li>
+                <label
+                  ><input type="checkbox" /><span
+                    >In jeder Breite geprüft, in der sie umbricht.</span
+                  ></label
+                >
+              </li>
+            </ul>
+            <p class="checklist-foot">
+              <span data-count="component"></span>
+              <button type="button" data-reset="component">Zurücksetzen</button>
+            </p>
+          </div>
+        </section>
+        <!-- ---------------------------------------------------------- -->
+        <section id="skill">
+          <div class="sec-head">
+            <p class="eyebrow">16</p>
+            <h3>Den Skill mitnehmen</h3>
+            <p class="takeaway">
+              Ein Skill für Claude Code, der dieses System in einem neuen
+              Statamic-Projekt aufsetzt — in Stufen.
+            </p>
+          </div>
+          <div class="prose">
+            <p>
+              Zwei Skills gehören zu diesem System.
+              <strong><code>lumos-statamic</code></strong> setzt es in einem neuen
+              Projekt auf: aktuelle Version holen, Tokens, Themes und
+              Layer-Struktur anlegen, die Komponenten portieren, die du
+              auswählst, und auf Wunsch das CMS einrichten. Er hält in der
+              <code>CLAUDE.md</code> des Projekts fest, welcher Stand verbaut
+              ist, damit ein späterer Lauf dort weitermacht, wo der letzte
+              aufgehört hat.
+            </p>
+            <p>
+              <strong><code>lumos-extend-system</code></strong> erweitert das
+              System später: ein neuer Textstil, eine Abstandsstufe, ein Theme
+              oder ein Breakpoint. Er gehört ins Projekt, nicht in die globale
+              Sammlung, und <code>lumos-statamic</code> legt ihn dort in Stufe 1
+              gleich mit an.
+            </p>
+
+            <p class="downloads">
+              <a class="download" href="skills/lumos-skills.zip" download
+                >↓ Beide Skills als ZIP (20 KB)</a
+              >
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>Installieren</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>mkdir -p ~/.claude/skills
+unzip -o ~/Downloads/lumos-skills.zip -d ~/.claude/skills</code></pre>
+            </figure>
+
+            <p>
+              Damit stehen beide in allen Projekten zur Verfügung. Soll ein Skill
+              nur in einem Projekt liegen, nimm <code>.claude/skills</code> im
+              Projektordner als Ziel — für <code>lumos-extend-system</code> ist
+              das der vorgesehene Ort. Gestartet werden sie in Claude Code mit
+              <code>/lumos-statamic</code> und
+              <code>/lumos-extend-system</code>.
+            </p>
+
+            <h4 id="skill-original">Die Skills des Frameworks dazu</h4>
+            <p>
+              Das Framework bringt eigene Skills mit:
+              <code>lumos-import-figma</code> baut eine Seite aus einer
+              Figma-Datei, <code>lumos-import-webflow</code> holt eine
+              Webflow-Site herüber, <code>lumos-upgrade-version</code> zieht ein
+              Projekt auf die neueste Version,
+              <code>lumos-audit-props</code> prüft die Komponenten auf eine
+              einheitliche Schnittstelle, und
+              <code>lumos-scaling-graphic</code> baut Grafiken, die als ganzes
+              skalieren. Sie liegen im Repository des Frameworks und werden von
+              dort geholt:
+            </p>
+
+            <figure class="code">
+              <figcaption>
+                <span>Im Terminal</span>
+                <button class="copy" type="button">Kopieren</button>
+              </figcaption>
+              <pre><code>git clone --depth 1 https://github.com/lumosframework/lumos-for-astro /tmp/lumos
+mkdir -p ~/.claude/skills
+cp -R /tmp/lumos/.claude/skills/lumos-* ~/.claude/skills/
+rm -rf /tmp/lumos</code></pre>
+            </figure>
+
+            <p>
+              Ein Hinweis dazu: Diese Skills nennen die Pfade des
+              Original-Frameworks, also <code>src/components/X.astro</code> statt
+              <code>resources/views/components/x.antlers.html</code>. Die
+              Zuordnung steht in der <code>CLAUDE.md</code> des Projekts. Am
+              ehesten direkt brauchbar sind
+              <code>lumos-scaling-graphic</code> und
+              <code>lumos-import-figma</code>, weil sie vor allem über CSS und
+              Design sprechen.
+            </p>
+
+            <h4 id="skill-dateien">Die Dateien einzeln</h4>
+            <div class="wide">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Datei</th>
+                    <th>Inhalt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <a href="skills/lumos-statamic/SKILL.md">SKILL.md</a>
+                    </td>
+                    <td>
+                      Der Ablauf: aktuellen Stand holen, Stufe, Komponenten, CMS-
+                      Modus und Sprache abfragen, dann aufsetzen.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a href="skills/lumos-statamic/references/antlers-porting.md"
+                        >references/antlers-porting.md</a
+                      >
+                    </td>
+                    <td>
+                      Wie eine Komponente zum Antlers-Partial wird, und jeder
+                      Stolperstein aus Abschnitt 13.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a href="skills/lumos-statamic/references/cms-modes.md"
+                        >references/cms-modes.md</a
+                      >
+                    </td>
+                    <td>
+                      Die beiden CMS-Modi als Blueprint- und Template-Muster,
+                      plus die Regeln für kundensichere Felder.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a
+                        href="skills/lumos-statamic/references/project-claude-md.md"
+                        >references/project-claude-md.md</a
+                      >
+                    </td>
+                    <td>
+                      Vorlage für die <code>CLAUDE.md</code> eines neuen
+                      Projekts.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a href="skills/lumos-extend-system/SKILL.md"
+                        >lumos-extend-system/SKILL.md</a
+                      >
+                    </td>
+                    <td>
+                      Die vier Erweiterungen mit allen Anfassstellen: Textstil,
+                      Abstandsstufe, Theme, Breakpoint. Dazu die Regel, dass
+                      Wertänderungen nach <code>base.css</code> und Ergänzungen
+                      nach <code>site.css</code> gehören, damit ein Update
+                      konfliktfrei bleibt.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="note">
+              <p class="eyebrow">Warum der Skill nichts über Klassen weiß</p>
+              <p>
+                Im Skill stehen keine Klassennamen, Tokens oder Params. Die holt
+                er bei jedem Lauf frisch aus der aktuellen Version des Systems.
+                Enthalten ist nur, was sich nicht ändert: die Übersetzung nach
+                Antlers, die Stolpersteine und der Aufbau des CMS.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site">
+        <span>Handbuch für Entwickler</span>
+        <span>Statamic 6 · Antlers · Plain CSS</span>
+        <a class="top-link" href="#top">↑ Nach oben</a>
+      </footer>
+    </div>
+    <script>
+      /* ================================================================== *
+       * Mitlaufende Navigation: Abschnitt und Unterabschnitt markieren
+       * ================================================================== */
+      (() => {
+        const nav = document.getElementById("nav");
+        if (!nav) return;
+
+        const label = nav.querySelector("[data-current-label]");
+        const link = (hash) => nav.querySelector(`a[href="${hash}"]`);
+        const sections = [...document.querySelectorAll("section[id]")];
+        const subs = [...document.querySelectorAll("main h4[id]")];
+
+        const setActive = (el, on) => {
+          el?.closest("li")?.classList.toggle("is-active", on);
+        };
+
+        let activeSection = null;
+        let activeSub = null;
+
+        const spy = (targets, apply, margin) => {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (entry.isIntersecting) apply(entry.target);
+              }
+            },
+            { rootMargin: margin },
+          );
+          targets.forEach((target) => observer.observe(target));
+        };
+
+        spy(
+          sections,
+          (target) => {
+            const next = link(`#${target.id}`);
+            if (next === activeSection) return;
+            setActive(activeSection, false);
+            activeSection = next;
+            setActive(activeSection, true);
+            if (label && next) label.textContent = next.textContent.trim();
+          },
+          "-15% 0px -70% 0px",
+        );
+
+        spy(
+          subs,
+          (target) => {
+            const next = link(`#${target.id}`);
+            if (next === activeSub) return;
+            setActive(activeSub, false);
+            activeSub = next;
+            setActive(activeSub, true);
+          },
+          "-20% 0px -75% 0px",
+        );
+
+        // Ab 64rem ist die Navigation eine offene Seitenleiste, darunter ein
+        // aufklappbares Inhaltsverzeichnis, das nach dem Sprung zugeht.
+        const wide = matchMedia("(width >= 64rem)");
+        const sync = () => (nav.open = wide.matches);
+        wide.addEventListener("change", sync);
+        sync();
+
+        nav.addEventListener("click", (event) => {
+          if (!event.target.closest("a")) return;
+          if (!wide.matches) nav.open = false;
+        });
+      })();
+
+      /* ================================================================== *
+       * Code kopieren
+       * ================================================================== */
+      (() => {
+        for (const button of document.querySelectorAll(".copy")) {
+          button.addEventListener("click", async () => {
+            const code = button.closest("figure")?.querySelector("code");
+            if (!code) return;
+            try {
+              await navigator.clipboard.writeText(code.textContent.trim());
+              const before = button.textContent;
+              button.textContent = "Kopiert";
+              setTimeout(() => (button.textContent = before), 1600);
+            } catch {
+              button.textContent = "Strg+C";
+            }
+          });
+        }
+      })();
+
+      /* ================================================================== *
+       * Entscheidungshilfe: brauche ich neues CSS?
+       * ================================================================== */
+      (() => {
+        const root = document.querySelector("[data-helper]");
+        if (!root) return;
+
+        const steps = [
+          {
+            q: "Deckt eine bestehende variant oder ein Param es ab?",
+            yes: {
+              title: "Nimm sie.",
+              body: 'Neues CSS ist das letzte Mittel. Ein anderes Grid ist meistens nur <code>small="2" large="4"</code> am grid-Partial.',
+            },
+          },
+          {
+            q: "Ist es ein Einzelfall aus einer oder zwei Eigenschaften?",
+            yes: {
+              title: "Utility ins Markup.",
+              body: "Eine oder zwei Änderungen, die für sich stehen. Sobald mehrere zusammenhalten müssen, um einen Look zu ergeben, ist es eine Variante.",
+            },
+          },
+          {
+            q: "Wiederholst du dasselbe auf jeder Instanz?",
+            yes: {
+              title: "Der Default ist falsch.",
+              body: "Nicht im Markup reparieren: ein Token in <code>lumos/base.css</code>, der Default des Params im Partial, oder ein neuer Param mit der häufigeren Variante als Default.",
+            },
+          },
+          {
+            q: "Wird das Markup mehrfach gebraucht oder hat es Bedingungen?",
+            yes: {
+              title: "Neues Partial plus eigene CSS-Datei.",
+              body: "<code>views/components/x.antlers.html</code> und <code>css/components/x.css</code>, importiert in <code>site.css</code> mit <code>layer(components)</code>. Wurzelklasse <code>.x_wrap</code>.",
+            },
+            no: {
+              title: "Eigene Klasse plus eigene CSS-Datei.",
+              body: "Kein Partial nötig. Die Datei heißt nach der Klassenfamilie, damit sie später zum Partial passt, wenn die zweite Verwendung kommt.",
+            },
+          },
+        ];
+
+        const stepEl = root.querySelector("[data-step]");
+        const questionEl = root.querySelector("[data-question]");
+        const answersEl = root.querySelector("[data-answers]");
+        const verdictEl = root.querySelector("[data-verdict]");
+        const titleEl = root.querySelector("[data-verdict-title]");
+        const bodyEl = root.querySelector("[data-verdict-body]");
+
+        let index = 0;
+
+        const ask = () => {
+          stepEl.textContent = `Frage ${index + 1} von ${steps.length}`;
+          questionEl.textContent = steps[index].q;
+          answersEl.hidden = false;
+          verdictEl.hidden = true;
+        };
+
+        const answer = (verdict) => {
+          titleEl.textContent = verdict.title;
+          bodyEl.innerHTML = verdict.body;
+          answersEl.hidden = true;
+          verdictEl.hidden = false;
+          stepEl.textContent = `Ergebnis nach Frage ${index + 1}`;
+        };
+
+        root.addEventListener("click", (event) => {
+          const choice = event.target.closest("[data-answer]");
+          if (choice) {
+            const step = steps[index];
+            const verdict =
+              choice.dataset.answer === "yes" ? step.yes : step.no;
+            if (verdict) return answer(verdict);
+            index += 1;
+            return ask();
+          }
+          if (event.target.closest("[data-restart]")) {
+            index = 0;
+            ask();
+          }
+        });
+
+        ask();
+      })();
+
+      /* ================================================================== *
+       * Checklisten: Stand im Browser merken
+       * ================================================================== */
+      (() => {
+        const read = (key) => {
+          try {
+            return JSON.parse(localStorage.getItem(`lumos-doc:${key}`)) ?? [];
+          } catch {
+            return [];
+          }
+        };
+        const write = (key, value) => {
+          try {
+            localStorage.setItem(`lumos-doc:${key}`, JSON.stringify(value));
+          } catch {
+            /* privates Fenster oder blockierte Site-Daten: Häkchen halten nur diese Sitzung */
+          }
+        };
+
+        for (const list of document.querySelectorAll("[data-checklist]")) {
+          const key = list.dataset.checklist;
+          const boxes = [...list.querySelectorAll("input[type=checkbox]")];
+          const countEl = document.querySelector(`[data-count="${key}"]`);
+          const resetEl = document.querySelector(`[data-reset="${key}"]`);
+          const saved = read(key);
+
+          const render = () => {
+            const done = boxes.filter((b) => b.checked).length;
+            if (countEl) {
+              countEl.textContent = `${done} von ${boxes.length} abgehakt`;
+            }
+          };
+
+          boxes.forEach((box, i) => {
+            box.checked = saved[i] === true;
+            box.addEventListener("change", () => {
+              write(
+                key,
+                boxes.map((b) => b.checked),
+              );
+              render();
+            });
+          });
+
+          resetEl?.addEventListener("click", () => {
+            boxes.forEach((b) => (b.checked = false));
+            write(key, []);
+            render();
+          });
+
+          render();
+        }
+      })();
+    </script>
+  </body>
+</html>

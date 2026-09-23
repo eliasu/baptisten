@@ -1,0 +1,57 @@
+---
+# An asset (optimized through Glide, with a srcset) or a path/URL (served
+# as-is, at its natural size). Lumos: `src`, reserved by the partial tag.
+# Nothing is output if it is missing.
+image: null
+# Leave unset on decorative images — renders `alt=""`. Assets fall back to their own alt field.
+alt: null
+# How the srcset is generated.
+#   full-width — widths up to the source width, tracking the viewport (default)
+#   constrained — widths up to twice `width`, capped by `sizes`
+#   densities — the display size at 1x and 2x, for a fixed-size image
+variant: full-width
+# How much of the viewport the image covers, when it isn't the full width. constrained only.
+sizes: null
+# Overrides the width read from the source. With `height` too, the image is cropped to that ratio.
+width: null
+# Overrides the height read from the source.
+height: null
+# Output quality preset: low 25, mid 50, high 80 (default), max 100.
+quality: high
+# For logos and cutouts: fit the whole image in rather than cropping, and drop the skeleton tint.
+transparent: false
+# Defer loading until the image nears the viewport. Set `eager` for anything above the fold.
+loading: lazy
+# auto, high or low. Use `high` on the page's largest above-the-fold image, and only that one.
+fetch_priority: auto
+class: null
+---
+{{ if view:image }}
+{{# Statamic port: an asset field gives an Asset; looping an asset field gives
+    its fields, so a set template hands over an array carrying `id`. Glide takes
+    the id either way. #}}
+{{ _src = view:image:id ?? view:image }}
+{{ _classes = 'image' + (view:variant == 'densities' ? ' densities' : '') + ((view:transparent | to_bool) ? ' transparent' : '') + (view:class ? (' ' + view:class) : '') }}
+{{ _alt = view:alt ?? view:image:alt ?? '' }}
+{{ if !view:image:url || view:image:extension == 'svg' }}
+<img src="{{ view:image:url ?? view:image }}" alt="{{ _alt }}" class="{{ _classes }}"{{ if view:width }} width="{{ view:width }}"{{ /if }}{{ if view:height }} height="{{ view:height }}"{{ /if }} loading="{{ view:loading }}"{{ if view:fetch_priority != 'auto' }} fetchpriority="{{ view:fetch_priority }}"{{ /if }}>
+{{ else }}
+{{ _qmap = ['low' => 25, 'mid' => 50, 'high' => 80, 'max' => 100] }}{{ _q = _qmap[view:quality] ?? 80 }}
+{{ _sw = view:image:width }}{{ _sh = view:image:height }}
+{{ _crop = view:width && view:height }}
+{{ if _crop }}{{ _ratio = view:height / view:width }}{{ else }}{{ _ratio = _sh / _sw }}{{ /if }}
+{{ _limit = (_sh / _ratio) | round }}{{ _limit = _limit < _sw ? _limit : _sw }}
+{{ _dw = view:width ?? _sw }}{{ _dw = _dw < _limit ? _dw : _limit }}
+{{ _dh = (_dw * _ratio) | round }}
+{{ _cap = view:variant == 'constrained' ? (_dw * 2) : _limit }}{{ _cap = _cap < _limit ? _cap : _limit }}
+{{ _rem = _dw / 16 }}
+{{ if view:variant == 'constrained' }}{{ _sizes = view:sizes ?? '(min-width: {_rem}rem) {_rem}rem, 100vw' }}{{ else }}{{ _sizes = view:loading == 'lazy' ? 'auto, 100vw' : '100vw' }}{{ /if }}
+{{ _dw2 = _dw * 2 }}{{ _dh2 = (_dw2 * _ratio) | round }}{{ _ch = (_cap * _ratio) | round }}
+{{ _breakpoints = [640, 750, 828, 1080, 1280, 1668, 2048, 2560] }}
+<img
+    src="{{ glide :src="_src" :width="_dw" :height="_dh" fit="crop_focal" :quality="_q" }}"
+    {{ if view:variant == 'densities' }}srcset="{{ glide :src="_src" :width="_dw" :height="_dh" fit="crop_focal" :quality="_q" }} 1x{{ if _dw2 <= _limit }}, {{ glide :src="_src" :width="_dw2" :height="_dh2" fit="crop_focal" :quality="_q" }} 2x{{ /if }}"
+    {{ else }}srcset="{{ _breakpoints }}{{ if value < _cap }}{{ _bh = (value * _ratio) | round }}{{ glide :src="_src" :width="value" :height="_bh" fit="crop_focal" :quality="_q" }} {{ value }}w, {{ /if }}{{ /_breakpoints }}{{ glide :src="_src" :width="_cap" :height="_ch" fit="crop_focal" :quality="_q" }} {{ _cap }}w" sizes="{{ _sizes }}"{{ /if }}
+    alt="{{ _alt }}" class="{{ _classes }}" width="{{ _dw }}" height="{{ _dh }}" loading="{{ view:loading }}"{{ if view:fetch_priority != 'auto' }} fetchpriority="{{ view:fetch_priority }}"{{ /if }}>
+{{ /if }}
+{{ /if }}

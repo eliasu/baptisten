@@ -1,0 +1,8 @@
+---
+# The date to render. Nothing is output if it is missing.
+date: null
+# ISO format string (Carbon `isoFormat`). Defaults to the long date in the site's locale.
+format: LL
+---
+{{# Statamic port: formats with Carbon in the site's locale, not Intl. #}}
+{{ if view:date }}<time datetime="{{ view:date | format('Y-m-d') }}">{{ view:date | iso_format(view:format) }}</time>{{ /if }}

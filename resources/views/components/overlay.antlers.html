@@ -1,0 +1,10 @@
+---
+# How the tint is distributed.
+#   solid — even across the whole area (default)
+#   gradient — clear at the top, darkening towards the bottom
+variant: solid
+# How dark the tint is, as a percentage of the variant's full strength (0–100).
+strength: 50
+class: null
+---
+<div class="overlay{{ if view:variant != 'solid' }} {{ view:variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}" style="--_strength: {{ view:strength }};"></div>

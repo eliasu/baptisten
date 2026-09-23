@@ -1,0 +1,34 @@
+---
+# How the two columns are arranged. The default slot is the first column,
+# the `column2` slot the second.
+#   stack — one column, everything in order (default)
+#   auto-width — a row, each column only as wide as its content
+#   columns — two even columns from 64rem up
+#   breakout — full viewport width, the visual bleeding off one edge
+#   contain — two columns on a filled, rounded surface
+#   sticky-content — two columns; the content holds as the visual scrolls
+#   sticky-visual — two columns; the visual holds as the content scrolls
+#   card — the visual fills the surface, the content centered over it
+variant: stack
+# Show the second column first. columns, breakout, contain only.
+reverse: false
+# Stretch the visual to the height of the content beside it rather than hold
+# its ratio. From 64rem up; columns, breakout, contain only.
+fill: false
+# Center the contents of each column. stack only.
+centered: false
+# How visible the card's visual is, as a percentage (0–100). card only. Defaults to 70.
+media_opacity: null
+# Classes for the first column, which holds the default slot.
+column1_class: null
+# Classes for the second column.
+column2_class: null
+class: null
+---
+{{ _column1 = slot | trim }}{{ _column2 = slot:column2 | trim }}
+{{ if _column1 || _column2 }}
+<div class="layout{{ if view:variant == 'card' }} card-layout theme-dark{{ elseif view:variant != 'stack' }} {{ view:variant }}{{ /if }}{{ if view:reverse | to_bool }} reversed{{ /if }}{{ if view:fill | to_bool }} fill{{ /if }}{{ if view:centered | to_bool }} centered{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}"{{ if view:variant == 'card' && view:media_opacity !== null && view:media_opacity >= 0 && view:media_opacity <= 100 && view:media_opacity != 70 }} style="--_media-opacity: {{ view:media_opacity }}"{{ /if }}>
+    {{ if _column1 }}<div{{ if view:column1_class }} class="{{ view:column1_class }}"{{ /if }}>{{ _column1 }}</div>{{ /if }}
+    {{ if _column2 }}<div{{ if view:column2_class }} class="{{ view:column2_class }}"{{ /if }}>{{ _column2 }}</div>{{ /if }}
+</div>
+{{ /if }}

@@ -1,0 +1,7 @@
+---
+# Id of the element it jumps to, written without the `#`.
+target: main
+# What it says once it is on screen.
+label: Zum Hauptinhalt springen
+---
+{{ partial:components/button element="link" href="#{view:target}" class="skip-link" }}{{ view:label }}{{ /partial:components/button }}

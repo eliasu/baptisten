@@ -1,0 +1,25 @@
+tree:
+  -
+    title: Gottesdienste
+    url: '#gottesdienste'
+  -
+    title: Livestream
+    url: 'https://www.youtube.com/@baptistenschoeneberg'
+  -
+    title: Angebote
+    url: '#angebote'
+  -
+    title: Termine
+    url: '#termine'
+  -
+    title: Team
+    url: '#team'
+  -
+    title: 'Über uns'
+    url: '#ueber-uns'
+  -
+    title: Spenden
+    url: '#spenden'
+  -
+    title: Kontakt
+    url: '#kontakt'

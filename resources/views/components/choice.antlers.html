@@ -1,0 +1,30 @@
+---
+# The text beside the control, and what it is called.
+label: null
+# What it submits when it is chosen. Defaults to `on`.
+value: null
+# Whether it stands on its own (checkbox) or belongs to a group (radio).
+type: checkbox
+# The name it submits under. Taken from the label where it is not set. For a
+# radio, the name every choice in the group shares.
+name: null
+# How the control is drawn.
+#   default — a box or a circle beside the text
+#   toggle — a switch that slides
+#   chip — the whole of it reads as one control, and fills when chosen
+variant: default
+# Whether it starts out chosen.
+checked: false
+# Marks the choice as needed.
+required: false
+class: null
+---
+{{ if view:label }}
+<label class="form-choice{{ if view:variant != 'default' }} {{ view:variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}">
+    <input class="form-choice_input" type="{{ view:type }}" name="{{ view:name ?? (view:label | slugify) }}"{{ if view:value }} value="{{ view:value }}"{{ /if }}{{ if view:checked | to_bool }} checked{{ /if }}{{ if view:required | to_bool }} required{{ /if }}>
+    <span class="form-choice_mark" aria-hidden="true">
+        {{ if view:type == 'radio' }}<span class="form-choice_dot"></span>{{ else }}{{ partial:components/icon name="check" variant="small" class="form-choice_tick" }}{{ /if }}
+    </span>
+    <span class="form-choice_text text-style-main">{{ view:label }}</span>
+</label>
+{{ /if }}

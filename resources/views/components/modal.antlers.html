@@ -1,0 +1,26 @@
+---
+# What opens it: `[data-modal-open="<id>"]`, a link to `#<id>`, or the
+# `?modal=<id>` query. Nothing is output without one.
+id: null
+# Names the dialog for a screen reader.
+label: null
+# How it arrives.
+#   small — a centred card that rises into place (default)
+#   side-panel — a full-height column sliding in from the end edge
+#   full-screen — fills the viewport, the content fading up
+variant: small
+class: null
+---
+{{# JS: resources/js/components/modal.ts #}}
+{{ if view:id && (slot | trim) }}
+<dialog id="{{ view:id }}" class="modal_wrap{{ if view:variant != 'small' }} {{ view:variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}"{{ if view:label }} aria-label="{{ view:label }}"{{ /if }}>
+    <div class="modal_content">
+        {{ partial:components/button class="modal_close" variant="close" emphasis="secondary" attrs="data-modal-close" }}
+        <div class="modal_scroll" data-modal-scroll>
+            <div class="modal_body margin-trim">
+                {{ slot | trim }}
+            </div>
+        </div>
+    </div>
+</dialog>
+{{ /if }}

@@ -1,0 +1,79 @@
+.footer_wrap {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--section-space-small) var(--space-8);
+  padding-inline: var(--site-margin);
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.footer_inner {
+  width: 100%;
+  max-width: var(--max-width-main);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.footer_top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-6);
+}
+
+/* Statamic port: the wordmark is text, not an SVG. It carries the footer,
+   so it is set far larger than the one in the bar. */
+.footer_logo {
+  display: block;
+  max-width: 100%;
+  font-size: var(--h3);
+  font-weight: var(--primary-bold);
+  line-height: var(--line-height-medium);
+  letter-spacing: var(--letter-spacing-tight);
+  transition: opacity var(--hover-duration) var(--hover-ease);
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
+
+.footer_links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-small);
+  font-weight: var(--primary-medium);
+}
+
+.footer_link {
+  color: var(--text);
+  text-decoration: none;
+  transition: color var(--hover-duration) var(--hover-ease);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--text);
+    }
+  }
+}
+
+.footer_bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  padding-top: var(--space-6);
+}
+
+.footer_copyright {
+  color: var(--text-2);
+}
+
+/* Statamic port: the line the church closes every page with. */
+.footer_statement {
+  color: var(--accent);
+}

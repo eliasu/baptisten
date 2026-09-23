@@ -1,8 +1,10 @@
-title: Asset
+title: Medien
 fields:
   -
     handle: alt
     field:
-      display: 'Alt Text'
       type: text
-      instructions: 'Description of the image'
+      display: Bildbeschreibung
+      instructions: 'Was auf dem Bild zu sehen ist — für Menschen, die es nicht sehen können, und für Suchmaschinen.'
+      validate:
+        - required

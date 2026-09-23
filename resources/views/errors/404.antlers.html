@@ -1,3 +1,9 @@
-<main>
-    <h1>404 Page not found.</h1>
-</main>
+{{ partial:components/section padding_top="large" padding_bottom="large" full_height="true" align="center" }}
+    {{ partial:components/content-wrapper centered="true" }}
+        {{ partial:components/heading tag="h1" variant="h1" }}Seite nicht gefunden{{ /partial:components/heading }}
+        {{ partial:components/paragraph variant="large" max_width="48" }}Diese Seite gibt es nicht (mehr). Vielleicht hilft der Weg zurück zur Startseite.{{ /partial:components/paragraph }}
+        {{ partial:components/button-wrapper }}
+            {{ partial:components/button element="link" href="/" }}Zur Startseite{{ /partial:components/button }}
+        {{ /partial:components/button-wrapper }}
+    {{ /partial:components/content-wrapper }}
+{{ /partial:components/section }}

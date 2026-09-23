@@ -1,0 +1,14 @@
+---
+# How the rows are drawn.
+#   rows — separated by a rule, on the section's own background (default)
+#   boxed — each row a bordered panel on the second background
+variant: rows
+class: null
+---
+{{# A numbered or marked list of rows: events, offers, service facts. The rows
+    are `content-index-item`. #}}
+{{ if slot | trim }}
+<ul class="index-list_wrap{{ if view:variant != 'rows' }} {{ view:variant }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ slot | trim }}
+</ul>
+{{ /if }}

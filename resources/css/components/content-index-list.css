@@ -1,0 +1,73 @@
+.index-list_wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  /* Rules between the rows, closed off top and bottom, so the list reads as
+     one block rather than a stack of separate things. */
+  > .index-item_wrap {
+    border-top: var(--border-width) solid var(--border);
+  }
+  > .index-item_wrap:last-child {
+    border-bottom: var(--border-width) solid var(--border);
+  }
+
+  /* Boxed rows carry their own surface and a full border; collapsing the
+     top border keeps the seam between two rows a single line. */
+  &.boxed > .index-item_wrap {
+    background-color: var(--background-2);
+    border: var(--border-width) solid var(--border);
+    padding: var(--space-4);
+  }
+  &.boxed > .index-item_wrap + .index-item_wrap {
+    margin-top: calc(var(--border-width) * -1);
+  }
+}
+
+.index-item_wrap {
+  display: flex;
+  align-items: start;
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+
+  .boxed > & {
+    gap: var(--space-5);
+  }
+}
+
+.index-item_marker {
+  flex: none;
+  color: var(--accent);
+  font-family: var(--secondary-family);
+  font-weight: var(--secondary-regular);
+  font-size: var(--h3);
+  line-height: var(--line-height-medium);
+  letter-spacing: var(--letter-spacing-normal);
+  --_trim-top: var(--secondary-trim-top);
+  --_trim-bottom: var(--secondary-trim-bottom);
+
+  /* A marker that carries its row — a weekday, a span of time — gets a
+     column of its own so the details beside it line up down the list. */
+  .large > & {
+    font-size: var(--h2);
+    font-weight: var(--secondary-semibold);
+    @media (width >= 48rem) {
+      width: 9rem;
+    }
+  }
+}
+
+.index-item_details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--space-2);
+
+  /* The gap above sets the rhythm here, not each style's own margin. */
+  > [class] {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}

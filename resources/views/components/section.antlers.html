@@ -1,0 +1,34 @@
+---
+# Colors this section and everything inside it: inherit, light, dark or brand.
+theme: inherit
+# Space above the content.
+#   medium — the usual gap between sections (default)
+#   none — flush, for a section that meets the one above it
+#   even — the site margin, matching the space at the sides
+#   small, large — tighter or looser than usual
+#   navoverlap — clears a nav sitting over the page
+padding_top: medium
+# Space below the content. Takes the same values as `padding_top`.
+padding_bottom: medium
+# Space between the children, from the spacing scale (0–8, small, medium, large).
+gap: '8'
+# Where the content sits across the section: start, center or end. Unset, start.
+align: null
+# Fills the screen's height, however little content there is.
+full_height: false
+# Classes for the container inside the section, which sets the width.
+container_class: null
+class: null
+---
+{{# Named slot `background` renders behind the container. #}}
+{{ _pad = ['none' => '0', 'even' => 'sitemargin'] }}
+{{ if (slot | trim) || (slot:background | trim) }}
+<section class="section{{ if view:padding_top != 'medium' }} padding-top-{{ _pad[view:padding_top] ?? view:padding_top }}{{ /if }}{{ if view:padding_bottom != 'medium' }} padding-bottom-{{ _pad[view:padding_bottom] ?? view:padding_bottom }}{{ /if }}{{ if view:full_height | to_bool }} min-height-screen{{ /if }}{{ if view:theme != 'inherit' }} theme-{{ view:theme }}{{ /if }}{{ if view:align }} alignment-{{ view:align }}{{ /if }}{{ if view:class }} {{ view:class }}{{ /if }}">
+    {{ slot:background | trim }}
+    {{ if slot | trim }}
+    <div class="container{{ if view:gap != '8' }} gap-{{ view:gap }}{{ /if }}{{ if view:container_class }} {{ view:container_class }}{{ /if }}">
+        {{ slot | trim }}
+    </div>
+    {{ /if }}
+</section>
+{{ /if }}
